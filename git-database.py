@@ -7,8 +7,6 @@ COMMIT_START_SYMBOL = chr(30)
 # Unit separator
 COMMIT_SPLIT_SYMBOL = chr(31)
 
-print(1)
-
 repo_path = "test-repo"
 database_path = "test"
 
@@ -26,7 +24,6 @@ if argc > 1:
     database_path = path[-1]
 if argc > 2:
     database_path = sys.argv[2]
-print(1)
 database_path += ".db"
 
 con = sqlite3.connect(database_path)
@@ -45,8 +42,7 @@ cur.execute("""
 cur.execute("""
     CREATE TABLE if not exists files(
         fileID integer NOT NULL PRIMARY KEY,
-        filePath varchar(255) NOT NULL UNIQUE,
-        extension varchar(255)
+        filePath varchar(255) NOT NULL UNIQUE
     )
 """)
 
@@ -61,21 +57,20 @@ cur.execute("""
         PRIMARY KEY (hash, fileID)
     )
 """)
-print(1)
 insert_commit_sql = """
-    INSERT INTO
+    INSERT OR IGNORE INTO
     commits(hash, authorName, authorEmail, committerName, committerEmail)
     VALUES(?, ?, ?, ?, ?)
     """
 
 insert_file_sql = """
-    INSERT INTO
+    INSERT OR IGNORE INTO
     files(filePath)
     VALUES(?)
     """
 
 insert_commitFile_sql = """
-    INSERT INTO
+    INSERT OR IGNORE INTO
     commitFile(hash, fileID, linesAdded, linesRemoved)
     VALUES(?, ?, ?, ?)
     """
@@ -105,7 +100,7 @@ for l in sys.stdin:
         cur.execute(insert_commit_sql, fields)
     else:
         added, removed, file_path = line.split("\t")
-
+        
         # Section for dealing with renaming
         old_name = file_path
         new_name = file_path
@@ -124,21 +119,23 @@ for l in sys.stdin:
             new_name = file_path
             name_changed = False
         
-        # Insert into file table
+        # If new_name already exists, rewrite the IDs matching new_name to old_name,
+        # then delete the entry for new_name
         try:
-            cur.execute(insert_file_sql, (old_name,))
+            cur.execute("""UPDATE commitFile SET fileID = (SELECT fileID FROM files WHERE filePATH = ?) WHERE fileID = (SELECT fileID FROM files WHERE filePATH = ?)""", (old_name, new_name))
+            cur.execute("DELETE FROM files WHERE files.filePath = ?", (new_name,))
         except:
-            pass
-        
-        print(line,old_name,new_name)
-        # Update file table with new name
-        if name_changed:
-            cur.execute(update_file_sql, (new_name, old_name))
+            print(fields[0])
 
-        # Update commitFile table
+        # Update file table with new name
+        cur.execute(update_file_sql, (new_name, old_name))
+
+        # Insert into file table
+        cur.execute(insert_file_sql, (new_name,))
+
+        # Insert into commitFile table
         cur.execute("SELECT files.fileID FROM files WHERE files.filePATH=?", (new_name,))
         x = cur.fetchall()
-        print(x)
         fileID = x[0][0]
         cur.execute(insert_commitFile_sql, (fields[0], fileID, added, removed))
         
@@ -146,5 +143,6 @@ for l in sys.stdin:
 con.commit()
 con.close()
 
-with open("lastcommit.txt", "w") as lc:
-    lc.write(fields[0])
+if len(fields) > 0:
+    with open(f"{database_path[:-3]}_lastcommit.txt", "w") as lc:
+        lc.write(fields[0])
