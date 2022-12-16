@@ -101,6 +101,10 @@ for l in sys.stdin:
     else:
         added, removed, file_path = line.split("\t")
         
+        # Ignore binary files
+        if added == "-" or removed == "-":
+            continue
+
         # Section for dealing with renaming
         old_name = file_path
         new_name = file_path
@@ -137,7 +141,7 @@ for l in sys.stdin:
         cur.execute("SELECT files.fileID FROM files WHERE files.filePATH=?", (new_name,))
         x = cur.fetchall()
         fileID = x[0][0]
-        cur.execute(insert_commitFile_sql, (fields[0], fileID, added, removed))
+        cur.execute(insert_commitFile_sql, (fields[0], fileID, int(added), int(removed)))
         
 
 con.commit()
