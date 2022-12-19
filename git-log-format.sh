@@ -14,4 +14,4 @@ fi
 # echo $range
 
 git -C $1/ log $range --pretty=format:"$git_commit_flag%H$sep%aN$sep%aE$sep%cN$sep%cE" \
---numstat --reverse --use-mailmap
+--numstat --reverse --use-mailmap --no-renames

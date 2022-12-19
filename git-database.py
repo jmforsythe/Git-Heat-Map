@@ -104,45 +104,15 @@ for l in sys.stdin:
         # Ignore binary files
         if added == "-" or removed == "-":
             continue
-
-        # Section for dealing with renaming
-        old_name = file_path
-        new_name = file_path
-        m_brace = rename_regex_brace.match(file_path)
-        m_no_brace = rename_regex_no_brace.match(file_path)
-        if m_brace:
-            old_name = m_brace.group(1) + m_brace.group(2) + m_brace.group(4)
-            new_name = m_brace.group(1) + m_brace.group(3) + m_brace.group(4)
-            name_changed = True
-        elif m_no_brace:
-            old_name = m_no_brace.group(1)
-            new_name = m_no_brace.group(2)
-            name_changed = True
-        else:
-            old_name = file_path
-            new_name = file_path
-            name_changed = False
         
-        # If new_name already exists, rewrite the IDs matching new_name to old_name,
-        # then delete the entry for new_name
-        try:
-            cur.execute("""UPDATE commitFile SET fileID = (SELECT fileID FROM files WHERE filePATH = ?) WHERE fileID = (SELECT fileID FROM files WHERE filePATH = ?)""", (old_name, new_name))
-            cur.execute("DELETE FROM files WHERE files.filePath = ?", (new_name,))
-        except:
-            print(fields[0])
-
-        # Update file table with new name
-        cur.execute(update_file_sql, (new_name, old_name))
-
         # Insert into file table
-        cur.execute(insert_file_sql, (new_name,))
+        cur.execute(insert_file_sql, (file_path,))
 
         # Insert into commitFile table
-        cur.execute("SELECT files.fileID FROM files WHERE files.filePATH=?", (new_name,))
+        cur.execute("SELECT files.fileID FROM files WHERE files.filePath=?", (file_path,))
         x = cur.fetchall()
         fileID = x[0][0]
         cur.execute(insert_commitFile_sql, (fields[0], fileID, int(added), int(removed)))
-        
 
 con.commit()
 con.close()
