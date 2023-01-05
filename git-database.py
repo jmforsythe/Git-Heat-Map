@@ -7,23 +7,31 @@ COMMIT_START_SYMBOL = chr(30)
 # Unit separator
 COMMIT_SPLIT_SYMBOL = chr(31)
 
+select_file_sql = """
+    (
+        SELECT files.fileID
+        FROM files
+        WHERE files.filePath = ?
+    )
+"""
+
 insert_commit_sql = """
-    INSERT OR IGNORE INTO
+    INSERT INTO
     commits(hash, authorName, authorEmail, committerName, committerEmail)
     VALUES(?, ?, ?, ?, ?)
-    """
+"""
 
 insert_file_sql = """
-    INSERT OR IGNORE INTO
+    INSERT INTO
     files(filePath)
     VALUES(?)
-    """
+"""
 
-insert_commitFile_sql = """
-    INSERT OR IGNORE INTO
+insert_commitFile_sql = f"""
+    INSERT INTO
     commitFile(hash, fileID, linesAdded, linesRemoved)
-    VALUES(?, ?, ?, ?)
-    """
+    VALUES(?, {select_file_sql}, ?, ?)
+"""
 
 update_file_sql = """
     UPDATE files
@@ -31,20 +39,17 @@ update_file_sql = """
     WHERE filePath = ?
 """
 
-rename_regex_brace = re.compile(r"(.*){(.*) => (.*)}(.*)")
-rename_regex_no_brace = re.compile(r"(.*) => (.*)")
+delete_commitFile_sql = f"""
+    DELETE FROM commitFile
+    WHERE commitFile.fileID = {select_file_sql}
+"""
 
-def parse_rename(file_path):
-    if x := rename_regex_brace:
-        old_name = x.group(1)+x.group(2)+x.group(4)
-        new_name = x.group(1)+x.group(3)+x.group(4)
-    elif x := rename_regex_no_brace:
-        old_name = x.group(1)
-        new_name = x.group(2)
-    else:
-        old_name = file_path
-        new_name = file_path
-    return old_name, new_name
+delete_file_sql = """
+    DELETE FROM files
+    WHERE files.filePath = ?
+"""
+
+regex_numstat_z = re.compile(r"([\-\d]+)\t([\-\d]+)\t(?:\0([^\0]+)\0([^\0]+)|([^\0]+))\0")
 
 def db_connection(argv):
     database_path = "test"
@@ -100,29 +105,60 @@ def create_tables(cur):
     """)
 
 def handle_commit(cur, commit_lines):
-    if len(commit_lines) == 0:
+    if len(commit_lines) <= 1:
         return
     fields = commit_lines[0][1:].split(COMMIT_SPLIT_SYMBOL)
     cur.execute(insert_commit_sql, fields)
-    for line in commit_lines[1:]:
-        handle_commit_line(cur, line, fields)
+
+    numstat_line = commit_lines[1]
+    matches = regex_numstat_z.findall(numstat_line)
+    # First commit in --compact-summary is on the end of previous line
+    first_secondary_line = numstat_line.split("\0")[-1]
+    commit_lines.insert(2, first_secondary_line)
+    for i in range(len(matches)):
+        try:
+            handle_match(cur, matches[i], commit_lines[2+i], fields)
+        except:
+            print(matches[i], commit_lines[2+i])
+            raise
     return fields[0]
 
-def handle_commit_line(cur, line, fields):
-    added, removed, file_path = line.split("\t")
-
-    # Ignore binary files
-    if added == "-" or removed == "-":
-        return
-    
-    # Insert into file table
+def file_create(cur, file_path):
     cur.execute(insert_file_sql, (file_path,))
 
-    # Insert into commitFile table
-    cur.execute("SELECT files.fileID FROM files WHERE files.filePath=?", (file_path,))
-    x = cur.fetchall()
-    fileID = x[0][0]
-    cur.execute(insert_commitFile_sql, (fields[0], fileID, int(added), int(removed)))
+def file_rename(cur, old_name, new_name):
+    cur.execute(update_file_sql, (new_name, old_name))
+
+def file_delete(cur, file_path):
+    cur.execute(delete_commitFile_sql, (file_path,))
+    cur.execute(delete_file_sql, (file_path,))
+
+def handle_match(cur, match, secondary_line, fields):
+    _ = secondary_line.split("|")
+    second_path = _[0].strip()
+
+    if match[4]:
+        file_path = match[4]
+    elif match[2] and match[3]:
+        file_rename(cur, match[2], match[3])
+        file_path = match[3]
+
+    if re.match(r"(.*)\(gone\)$", second_path):
+        file_delete(cur, file_path)
+
+    if "-" in match[:1]:
+        return
+
+    added = int(match[0])
+    removed = int(match[1])
+
+    second_total = int(_[1].split()[0])
+    assert(added+removed == second_total)
+
+    if re.match(r"(.*)\(new .{2}\)$", second_path):
+        cur.execute(insert_file_sql, (file_path,))
+
+    cur.execute(insert_commitFile_sql, (fields[0], file_path, added, removed))
 
 def main():
     con, database_path = db_connection(sys.argv)

@@ -5,6 +5,6 @@ SELECT RANK() OVER (ORDER BY SUM(commitFile.linesAdded)+SUM(commitFile.linesAdde
 FROM commitFile
 JOIN files ON files.fileID = commitFile.fileID
 JOIN commits ON commits.hash = commitFile.hash
-WHERE commits.authorEmail LIKE "%adguard.com"
+WHERE commits.authorEmail LIKE "%"
 GROUP BY files.filePath
 ORDER BY SUM(commitFile.linesAdded)+SUM(commitFile.linesAdded) DESC

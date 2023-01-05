@@ -31,7 +31,7 @@ def getJSONfromDB(database_name, query=getFilesSql):
         cur_dir.add_child(fileTree.File(path[-1], file_dict[key]))
 
     rootDir.update_val()
-    print(rootDir.get_json(0))
+    return rootDir.get_json(0)
 
 if __name__ == "__main__":
     import sys
