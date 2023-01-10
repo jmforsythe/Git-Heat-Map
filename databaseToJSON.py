@@ -5,6 +5,7 @@ getFilesSql = """
 SELECT files.filePath, SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved)
 FROM files
 JOIN commitFile on files.fileID = commitFile.fileID
+WHERE files.filePath NOTNULL
 GROUP BY files.filePath
 """
 
@@ -35,5 +36,8 @@ def getJSONfromDB(database_name, query=getFilesSql):
 
 if __name__ == "__main__":
     import sys
+    # Needed to stop encoding errors
+    sys.stdin.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding='utf-8')
     if len(sys.argv) > 1:
         print(getJSONfromDB(sys.argv[1]))

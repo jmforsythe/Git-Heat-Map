@@ -17,12 +17,12 @@ select_file_sql = """
 
 insert_commit_sql = """
     INSERT INTO
-    commits(hash, authorName, authorEmail, committerName, committerEmail)
-    VALUES(?, ?, ?, ?, ?)
+    commits(hash, authorName, authorEmail, authorDate, committerName, committerEmail, committerDate)
+    VALUES(?, ?, ?, ?, ?, ?, ?)
 """
 
 insert_file_sql = """
-    INSERT INTO
+    INSERT OR IGNORE INTO
     files(filePath)
     VALUES(?)
 """
@@ -34,7 +34,7 @@ insert_commitFile_sql = f"""
 """
 
 update_file_sql = """
-    UPDATE files
+    UPDATE OR IGNORE files
     SET filePath = ?
     WHERE filePath = ?
 """
@@ -47,6 +47,12 @@ delete_commitFile_sql = f"""
 delete_file_sql = """
     DELETE FROM files
     WHERE files.filePath = ?
+"""
+
+nullify_file_sql = """
+    UPDATE FILES
+    SET filePath = NULL
+    WHERE filePath = ?
 """
 
 regex_numstat_z = re.compile(r"([\-\d]+)\t([\-\d]+)\t(?:\0([^\0]+)\0([^\0]+)|([^\0]+))\0")
@@ -78,24 +84,26 @@ def create_tables(cur):
     cur.execute("""
         CREATE TABLE if not exists commits(
             hash character(40) NOT NULL PRIMARY KEY,
-            authorName varchar(255) NOT NULL,
-            authorEmail varchar(255) NOT NULL,
-            committerName varchar(255) NOT NULL,
-            committerEmail varchar(255) NOT NULL
+            authorName text NOT NULL,
+            authorEmail text NOT NULL,
+            authorDate text NOT NULL,
+            committerName text NOT NULL,
+            committerEmail text NOT NULL,
+            committerDate text NOT NULL
         )
     """)
 
     cur.execute("""
         CREATE TABLE if not exists files(
             fileID integer NOT NULL PRIMARY KEY,
-            filePath varchar(255) NOT NULL UNIQUE
+            filePath text UNIQUE
         )
     """)
 
     cur.execute("""
         CREATE TABLE if not exists commitFile(
             hash character(40),
-            fileID varchar(255),
+            fileID text,
             linesAdded integer,
             linesRemoved integer,
             FOREIGN KEY (hash) REFERENCES commits (hash),
@@ -104,11 +112,20 @@ def create_tables(cur):
         )
     """)
 
+def commit_create(cur, fields):
+    cur.execute(insert_commit_sql,
+                tuple(fields[i] for i in
+                ("hash", "authorName", "authorEmail", "authorDate",
+                 "committerName", "committerEmail", "committerDate")
+                ))
+
 def handle_commit(cur, commit_lines):
     if len(commit_lines) <= 1:
         return
-    fields = commit_lines[0][1:].split(COMMIT_SPLIT_SYMBOL)
-    cur.execute(insert_commit_sql, fields)
+    keys = ("hash", "authorName", "authorEmail", "authorDate", "committerName", "committerEmail", "committerDate")
+    fields = {keys[i] : commit_lines[0][1:].split(COMMIT_SPLIT_SYMBOL)[i]
+              for i in range(len(keys))}
+    commit_create(cur, fields)
 
     numstat_line = commit_lines[1]
     matches = regex_numstat_z.findall(numstat_line)
@@ -121,7 +138,7 @@ def handle_commit(cur, commit_lines):
         except:
             print(matches[i], commit_lines[2+i])
             raise
-    return fields[0]
+    return fields["hash"]
 
 def file_create(cur, file_path):
     cur.execute(insert_file_sql, (file_path,))
@@ -130,8 +147,10 @@ def file_rename(cur, old_name, new_name):
     cur.execute(update_file_sql, (new_name, old_name))
 
 def file_delete(cur, file_path):
-    cur.execute(delete_commitFile_sql, (file_path,))
-    cur.execute(delete_file_sql, (file_path,))
+    cur.execute(nullify_file_sql, (file_path,))
+
+def commitFile_create(cur, fields, file_path, added, removed):
+    cur.execute(insert_commitFile_sql, (fields["hash"], file_path, added, removed))
 
 def handle_match(cur, match, secondary_line, fields):
     _ = secondary_line.split("|")
@@ -143,22 +162,22 @@ def handle_match(cur, match, secondary_line, fields):
         file_rename(cur, match[2], match[3])
         file_path = match[3]
 
-    if re.match(r"(.*)\(gone\)$", second_path):
-        file_delete(cur, file_path)
+    if re.match(r"(.*)\(new.{0,3}\)$", second_path):
+        file_create(cur, file_path)
 
     if "-" in match[:1]:
-        return
+        added = 1
+        removed = 0
+    else:
+        added = int(match[0])
+        removed = int(match[1])
+        second_total = int(_[1].split()[0])
+        assert(added+removed == second_total)
 
-    added = int(match[0])
-    removed = int(match[1])
+    commitFile_create(cur, fields, file_path, added, removed)
 
-    second_total = int(_[1].split()[0])
-    assert(added+removed == second_total)
-
-    if re.match(r"(.*)\(new .{2}\)$", second_path):
-        cur.execute(insert_file_sql, (file_path,))
-
-    cur.execute(insert_commitFile_sql, (fields[0], file_path, added, removed))
+    if re.match(r"(.*)\(gone\)$", second_path):
+        file_delete(cur, file_path)
 
 def main():
     con, database_path = db_connection(sys.argv)

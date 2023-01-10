@@ -11,7 +11,5 @@ if [ -z "$2" ]
         range=$2..HEAD
 fi
 
-# echo $range
-
-git -C $1/ log $range --pretty=format:"%n$git_commit_flag%H$sep%aN$sep%aE$sep%cN$sep%cE" \
---no-merges --reverse --use-mailmap --numstat -z --compact-summary --stat-width=1024 --stat-name-width=1024 --stat-graph-width=1
+git -C $1/ log $range --pretty=format:"%n$git_commit_flag%H$sep%aN$sep%aE$sep%aI$sep%cN$sep%cE$sep%cI" \
+--reverse --use-mailmap --numstat -z --compact-summary --stat-width=1024 --stat-name-width=1024 --stat-graph-width=1

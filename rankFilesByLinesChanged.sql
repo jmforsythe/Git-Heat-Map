@@ -1,7 +1,8 @@
-SELECT RANK() OVER (ORDER BY SUM(commitFile.linesAdded)+SUM(commitFile.linesAdded) DESC) AS "Rank", 
-       SUM(commitFile.linesAdded)+SUM(commitFile.linesAdded) AS "Total changes",
+SELECT RANK() OVER (ORDER BY SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved) DESC) AS "Rank", 
+       SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved) AS "Total changes",
        files.filePath AS "File path"
 FROM commitFile
 JOIN files ON files.fileID = commitFile.fileID
-GROUP BY files.filePath
-ORDER BY SUM(commitFile.linesAdded)+SUM(commitFile.linesAdded) DESC
+WHERE files.filePath NOTNULL
+GROUP BY files.fileID
+ORDER BY Rank ASC
