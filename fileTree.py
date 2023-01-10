@@ -23,14 +23,13 @@ class Directory:
             self.children[c].tree_print(level+1)
 
     def get_json(self, level):
-        return "\n".join([SEPARATOR*level + "{",
-        SEPARATOR*(level+1) + f"\"name\": \"{self.name}\",",
-        SEPARATOR*(level+1) + f"\"val\": {self.val},",
-        SEPARATOR*(level+1) + "\"children\":",
-        SEPARATOR*(level+1) + "[",
+        if self.name:
+            name = f"\"{self.name}\": "
+        else:
+            name = ""
+        return "\n".join([SEPARATOR*level + name + "{" + f"\"val\": {self.val}, \"children\": {{",
         ",\n".join([self.children[c].get_json(level+2) for c in self.children]),
-        SEPARATOR*(level+1) + "]",
-        SEPARATOR*level + "}"])
+        SEPARATOR*level + "}}"])
 
 class File:
     def __init__(self, name, val):
@@ -44,4 +43,4 @@ class File:
         print(SEPARATOR*level + self.name, self.val)
 
     def get_json(self, level):
-        return SEPARATOR*level + f"{{\"name\": \"{self.name}\", \"val\": {self.val}}}"
+        return SEPARATOR*level + f"\"{self.name}\": {{\"val\": {self.val}}}"

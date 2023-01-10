@@ -16,10 +16,8 @@ Using these we can keep track of which files/commits changed the repository the 
 
 ### Planned features
 
-#### File rename tracking
-Unfortunately this is very difficult to do currently, due to the way renames can show up multiple times in the same git history. For the moment renames are disabled, so any renaming or moving of a file will make it lose its history in the database.
-#### File deleting
-Currently the command line arguments passed to `git log` do not clearly show when file are deleted, so the only way to determine that at the moment is to keep track of total number of lines and then delete the entry when this equals zero. There is another argument to `git log` which seems promising, so this shall be investigated further.
+#### Coauthor support
+Github inserts coauthors into the bottom of commit messages. Would like to add a new table for authors, allowing a commit to add multiple authors, and somehow parse the commit message to get coauthors.
 #### Submodule tracking
 Currently the only submodule changes that can be seen are the top level commit pointer changes. In the future would like to recursively explore submodules and add their files to the database.
 

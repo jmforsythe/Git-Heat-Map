@@ -21,7 +21,7 @@ def getJSONfromDB(database_name, query=getFilesSql):
 
     con.close()
 
-    rootDir = fileTree.Directory("/")
+    rootDir = fileTree.Directory("")
     for key in file_dict:
         cur_dir = rootDir
         path = key.split("/")
