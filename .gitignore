@@ -1,3 +1,5 @@
 *.db
 *_lastcommit.txt
 scratchpad.sql
+__pycache__/
+*.json
