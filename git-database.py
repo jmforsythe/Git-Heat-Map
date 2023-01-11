@@ -40,7 +40,7 @@ insert_author_sql = """
 """
 
 insert_commitAuthor_sql = f"""
-    INSERT INTO
+    INSERT OR IGNORE INTO
     commitAuthor(hash, authorEmail)
     VALUES(?, ?)
 """
@@ -146,27 +146,27 @@ def commit_create(cur, fields):
                  "committerName", "committerEmail", "committerDate")
                 ))
 
-def author_create(cur, fields):
-    cur.execute(insert_author_sql,
-                tuple(fields[i] for i in
-                ("authorEmail", "authorName")
-                ))
+def author_create(cur, email, name):
+    cur.execute(insert_author_sql, (email, name))
 
-def commitAuthor_create(cur, fields):
-    cur.execute(insert_commitAuthor_sql,
-                tuple(fields[i] for i in
-                ("hash", "authorEmail")
-                ))
+def commitAuthor_create(cur, hash, email):
+    cur.execute(insert_commitAuthor_sql, (hash, email))
 
 def handle_commit(cur, commit_lines):
     if len(commit_lines) <= 1:
         return
     keys = ("hash", "authorName", "authorEmail", "authorDate", "committerName", "committerEmail", "committerDate")
-    fields = {keys[i] : commit_lines[0][1:].split(COMMIT_SPLIT_SYMBOL)[i]
+    first_line_sep = commit_lines[0][1:].split(COMMIT_SPLIT_SYMBOL)
+    fields = {keys[i] : first_line_sep[i]
               for i in range(len(keys))}
     commit_create(cur, fields)
-    author_create(cur, fields)
-    commitAuthor_create(cur, fields)
+    author_create(cur, fields["authorEmail"], fields["authorName"])
+    commitAuthor_create(cur, fields["hash"], fields["authorEmail"])
+    for i in range(len(keys), len(first_line_sep)):
+        if x := re.match(r"(.*) <(.*)>", first_line_sep[i]):
+            name, email = x.groups()
+            author_create(cur, email, name)
+            commitAuthor_create(cur, fields["hash"], email)
 
     numstat_line = commit_lines[1]
     matches = regex_numstat_z.findall(numstat_line)
@@ -207,7 +207,7 @@ def handle_match(cur, match, secondary_line, fields):
         file_create(cur, file_path)
 
     if "-" in match[:1]:
-        added = 1
+        added = 0
         removed = 0
     else:
         added = int(match[0])

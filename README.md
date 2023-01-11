@@ -16,8 +16,6 @@ Using these we can keep track of which files/commits changed the repository the 
 
 ### Planned features
 
-#### Coauthor support
-Github inserts coauthors into the bottom of commit messages. Would like to add a new table for authors, allowing a commit to add multiple authors, and somehow parse the commit message to get coauthors.
 #### Submodule tracking
 Currently the only submodule changes that can be seen are the top level commit pointer changes. In the future would like to recursively explore submodules and add their files to the database.
 
