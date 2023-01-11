@@ -4,4 +4,4 @@ lastcommit=""
 if [ -f "${strip_last##*/}_lastcommit.txt" ]; then
     lastcommit=`cat ${strip_last##*/}_lastcommit.txt`
 fi
-./git-log-format.sh $1 $lastcommit | python git-database.py $1
+./git-log-format.sh $1 $lastcommit | python -m cProfile git-database.py $1

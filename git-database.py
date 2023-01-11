@@ -17,8 +17,8 @@ select_file_sql = """
 
 insert_commit_sql = """
     INSERT INTO
-    commits(hash, authorName, authorEmail, authorDate, committerName, committerEmail, committerDate)
-    VALUES(?, ?, ?, ?, ?, ?, ?)
+    commits(hash, authorDate, committerName, committerEmail, committerDate)
+    VALUES(?, ?, ?, ?, ?)
 """
 
 insert_file_sql = """
@@ -31,6 +31,18 @@ insert_commitFile_sql = f"""
     INSERT INTO
     commitFile(hash, fileID, linesAdded, linesRemoved)
     VALUES(?, {select_file_sql}, ?, ?)
+"""
+
+insert_author_sql = """
+    INSERT OR IGNORE INTO
+    author(authorEmail, authorName)
+    VALUES(?, ?)
+"""
+
+insert_commitAuthor_sql = f"""
+    INSERT INTO
+    commitAuthor(hash, authorEmail)
+    VALUES(?, ?)
 """
 
 update_file_sql = """
@@ -84,8 +96,6 @@ def create_tables(cur):
     cur.execute("""
         CREATE TABLE if not exists commits(
             hash character(40) NOT NULL PRIMARY KEY,
-            authorName text NOT NULL,
-            authorEmail text NOT NULL,
             authorDate text NOT NULL,
             committerName text NOT NULL,
             committerEmail text NOT NULL,
@@ -112,11 +122,40 @@ def create_tables(cur):
         )
     """)
 
+    cur.execute("""
+        CREATE TABLE if not exists author(
+            authorEmail text NOT NULL PRIMARY KEY,
+            authorName text NOT NULL
+        )
+    """)
+
+    cur.execute("""
+        CREATE TABLE if not exists commitAuthor(
+            hash character(40),
+            authorEmail text,
+            FOREIGN KEY (hash) REFERENCES commits (hash),
+            FOREIGN KEY (authorEmail) REFERENCES author (authorEmail),
+            PRIMARY KEY (hash, authorEmail)
+        )
+    """)
+
 def commit_create(cur, fields):
     cur.execute(insert_commit_sql,
                 tuple(fields[i] for i in
-                ("hash", "authorName", "authorEmail", "authorDate",
+                ("hash", "authorDate",
                  "committerName", "committerEmail", "committerDate")
+                ))
+
+def author_create(cur, fields):
+    cur.execute(insert_author_sql,
+                tuple(fields[i] for i in
+                ("authorEmail", "authorName")
+                ))
+
+def commitAuthor_create(cur, fields):
+    cur.execute(insert_commitAuthor_sql,
+                tuple(fields[i] for i in
+                ("hash", "authorEmail")
                 ))
 
 def handle_commit(cur, commit_lines):
@@ -126,6 +165,8 @@ def handle_commit(cur, commit_lines):
     fields = {keys[i] : commit_lines[0][1:].split(COMMIT_SPLIT_SYMBOL)[i]
               for i in range(len(keys))}
     commit_create(cur, fields)
+    author_create(cur, fields)
+    commitAuthor_create(cur, fields)
 
     numstat_line = commit_lines[1]
     matches = regex_numstat_z.findall(numstat_line)
@@ -179,6 +220,9 @@ def handle_match(cur, match, secondary_line, fields):
     if re.match(r"(.*)\(gone\)$", second_path):
         file_delete(cur, file_path)
 
+def get_line_stdin():
+    return sys.stdin.readline()
+
 def main():
     con, database_path = db_connection(sys.argv)
     cur = con.cursor()
@@ -191,7 +235,7 @@ def main():
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
 
-    for l in sys.stdin:
+    while l := get_line_stdin():
         line = l.rstrip()
         if len(line) == 0:
             continue
