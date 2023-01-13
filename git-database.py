@@ -194,8 +194,8 @@ def commitFile_create(cur, fields, file_path, added, removed):
     cur.execute(insert_commitFile_sql, (fields["hash"], file_path, added, removed))
 
 def handle_match(cur, match, secondary_line, fields):
-    _ = secondary_line.split("|")
-    second_path = _[0].strip()
+    p, n = secondary_line.split("|")
+    second_path = p.strip()
 
     if match[4]:
         file_path = match[4]
@@ -212,7 +212,7 @@ def handle_match(cur, match, secondary_line, fields):
     else:
         added = int(match[0])
         removed = int(match[1])
-        second_total = int(_[1].split()[0])
+        second_total = int(n.split()[0])
         assert(added+removed == second_total)
 
     commitFile_create(cur, fields, file_path, added, removed)

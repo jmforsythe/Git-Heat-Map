@@ -25,8 +25,7 @@ class Directory:
     def get_json(self, level):
         return "\n".join([SEPARATOR*level + "{" + f"\"name\": \"{self.name}\", \"val\": {self.val}, \"children\": [",
         ",\n".join([self.children[c].get_json(level+2) for c in self.children]),
-        SEPARATOR*(level+1) + "]",
-        SEPARATOR*level + "}"])
+        SEPARATOR*level + "]}"])
 
 class File:
     def __init__(self, name, val):
