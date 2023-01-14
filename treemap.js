@@ -9,16 +9,12 @@ function loadFile(filePath) {
     return result;
 }
 
-const my_json = JSON.parse(loadFile("tmp.json"))
-
 function sort_by_val(j) {
     if ("children" in j) {
         j.children.forEach(sort_by_val)
         j.children.sort((a,b) => b.val-a.val)
     }
 }
-
-sort_by_val(my_json)
 
 function worst(R, w) {
     const s = R.reduce((acc,x) => acc+x, 0)
@@ -33,7 +29,6 @@ function worst(R, w) {
 }
 
 NEST = true
-
 function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
     if (width == 0 || height == 0) return
     let row_area = row.reduce((acc, cur) => acc+cur.val, 0)
@@ -73,7 +68,8 @@ function get_box_text_element(obj) {
     element.setAttribute("height", `${obj.height}`)
     element.classList.add(`svg_level_${obj.level}`)
     if (obj.leaf) element.classList.add("svg_leaf")
-    element.setAttribute("id", `svg_path_${obj.parent}/${obj.text}`)
+    const path = `${obj.parent}/${obj.text}`
+    element.setAttribute("id", `svg_path_${path}`)
     
     box.classList.add("svg_box")
 
@@ -84,7 +80,9 @@ function get_box_text_element(obj) {
     text.setAttribute("y", "50%")
     text.setAttribute("dominant-baseline", "middle")
     text.setAttribute("text-anchor", "middle")
-    text.setAttribute("font-size", `${obj.width/8}`)
+    let font_size = Math.min(1.5*obj.width/obj.text.length, 1.7*obj.height)
+    text.setAttribute("font-size", `${font_size}`)
+    text.setAttribute("stroke-width", `${font_size/100}`)
 
     element.appendChild(box)
     element.appendChild(text)
@@ -122,45 +120,102 @@ function squarify(x, y, width, height, children_in, parent_path, level, SVG_ROOT
     return row
 }
 
-function fraction_of_changes_to_percentage_for_colour(fraction) {
-    
+function fraction_to_saturation_and_lightness(fraction) {
+    let percentage = fraction*100
+    sat_x1 = 0.5
+    sat_x0 = 50
+    light_x1 = -0.3
+    light_x0 = 80
+    return [sat_x1*percentage+sat_x0, light_x1*percentage+light_x0]
 }
 
-function highlight_node(path, hue, percentage) {
+function highlight_node(path, hue, fraction) {
     let svg = document.getElementById(`svg_path_${path}`)
     if (!svg) return 
     let rect = svg.querySelector(".svg_box")
     if (!rect) return
-    svg.querySelector(".svg_box").style["fill"] = `hsl(${hue},${percentage}%,${50+(100-percentage)/2}%)`
+    [saturation, lightness] = fraction_to_saturation_and_lightness(fraction)
+    svg.querySelector(".svg_box").style["fill"] = `hsl(${hue},${saturation}%,${lightness}%)`
 }
 
-function highlight_obj_child(obj, hue, path, total) {
+function highlight_obj_child(obj, hue, path, highest) {
     obj.children.forEach((val, index, array) => {
         if ("children" in val) {
-            highlight_obj_child(val, hue, `${path}/${val.name}`, total)
+            highlight_obj_child(val, hue, `${path}/${val.name}`, highest)
         } else {
-            highlight_node(`${path}/${val.name}`, hue, 30+70*val.val/total)
+            highlight_node(`${path}/${val.name}`, hue, val.val/highest)
         }
     })
 }
 
-function highlight_obj(obj, hue) {
-    const total = obj.val
-    highlight_obj_child(obj, hue, "", total)
+function get_highest_leaf_in_obj(obj) {
+    if ("children" in obj) {
+        return Math.max(...obj.children.map((val) => val.val))
+    } else {
+        return obj.val
+    }
 }
 
-let thing = document.getElementById("jk")
+function highlight_obj(obj, hue) {
+    const highest = get_highest_leaf_in_obj(obj)
+    highlight_obj_child(obj, hue, "", highest)
+}
 
-const vw = Math.max(thing.clientWidth || 0, thing.innerWidth || 0)
-const vh = Math.max(thing.clientHeight || 0, thing.innerHeight || 0)
-const aspect_ratio = vw/vh
-const area = my_json.val
+function delete_children(node) {
+    while (node.firstChild) {
+        node.removeChild(node.lastChild)
+    }
+}
 
-const my_width = Math.sqrt(area*aspect_ratio)
-const my_height = my_json.val / my_width
-const x = 0
-const y = 0
+function get_child_from_path(obj, path) {
+    if (path == "") return obj
+    const index = path.indexOf("/")
+    if (index == -1) {
+        desired_child = obj.children.filter((child) => child.name == path)
+        console.log(desired_child)
+        if (desired_child.length == 1) {
+            return desired_child[0]
+        }
+    } else {
+        desired_child = obj.children.filter((child) => child.name == path.slice(0,index))
+        if (desired_child.length == 1) {
+            return get_child_from_path(desired_child[0], path.slice(index+1))
+        }
+    }
+}
 
-thing.setAttribute("viewBox", `0 0 ${my_width} ${my_height}`)
-squarify(x,y,my_width,my_height,my_json.children,"",0, thing)
-//thing.appendChild(get_box_text_element({"x": x, "y": y, "width": my_width, "height": my_height, "text": my_json.name, "parent": "", "level": 0, "leaf": false}))
+function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio) {
+    delete_children(SVG_ROOT)
+
+    const area = filetree_obj.val
+    const width = Math.sqrt(area*aspect_ratio)
+    const height = area / width
+
+    SVG_ROOT.setAttribute("viewBox", `0 0 ${width} ${height}`)
+    squarify(x,y,width,height,filetree_obj.children,"",0, SVG_ROOT)
+    highlight_obj(highlighting_obj, 0)
+}
+
+function display_filetree_path(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, path) {
+    display_filetree(get_child_from_path(filetree_obj, path), get_child_from_path(highlighting_obj, path), SVG_ROOT, x, y, aspect_ratio)
+}
+
+function main() {
+    const filetree_obj = JSON.parse(loadFile("filetree.json"))
+    const highlighting_obj = JSON.parse(loadFile("highlight.json"))
+    sort_by_val(filetree_obj)
+
+    let SVG_ROOT = document.getElementById("jk")
+    const vw = Math.max(SVG_ROOT.clientWidth || 0, SVG_ROOT.innerWidth || 0)
+    const vh = Math.max(SVG_ROOT.clientHeight || 0, SVG_ROOT.innerHeight || 0)
+    const aspect_ratio = vw/vh
+
+    const x = 0
+    const y = 0
+
+    path_to_display = ""
+
+    display_filetree_path(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, path_to_display)
+}
+
+main()

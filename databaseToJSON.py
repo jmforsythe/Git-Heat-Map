@@ -1,7 +1,7 @@
 import fileTree
 import sqlite3
 
-getFilesSql = """
+get_files_SQL = """
 SELECT files.filePath, SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved)
 FROM files
 JOIN commitFile on files.fileID = commitFile.fileID
@@ -9,13 +9,13 @@ WHERE files.filePath NOTNULL
 GROUP BY files.filePath
 """
 
-def getJSONfromDB(database_name, query=getFilesSql):
+def get_json_from_db(database_name, query=get_files_SQL):
     con = sqlite3.connect(database_name)
     cur = con.cursor()
 
     file_dict = {}
 
-    cur.execute(getFilesSql)
+    cur.execute(query)
     while line := cur.fetchone():
         file_dict[line[0]] = line[1]
 
@@ -40,4 +40,4 @@ if __name__ == "__main__":
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     if len(sys.argv) > 1:
-        print(getJSONfromDB(sys.argv[1]))
+        print(get_json_from_db(sys.argv[1]))
