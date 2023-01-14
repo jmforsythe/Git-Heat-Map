@@ -1,5 +1,14 @@
 # Git-Heat-Map
 
+## Basic use guide
+
+* Generate database with `./generate-db.sh {path_to_repo_dir}`
+* Generate filetree json with `python databaseToJSON.py {name_of_repo}.db > filetree.json`
+* Add the emails you'd like to search for to the example emails list in `databaseToJSONFiltered.py`
+* Generate highlighting json with `python databaseToJSONFiltered.py {name_of_repo}.db > filetree.json`
+* Run web server with `python flask_app.py` (flask must be installed, can be install from pip)
+* Connect on `127.0.0.1:5000`
+
 This project consists of two parts:
 
 1. Git log -> database
@@ -25,5 +34,4 @@ Taking the database above, shall calculate a [treemap](https://en.wikipedia.org/
 
 ### Planned features
 
-#### Basic webpage displaying a treemap of all files in the repo
 #### Filtering by author(s) to see which areas of a codebase people touch most
