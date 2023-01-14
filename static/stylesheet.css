@@ -1,3 +1,11 @@
+html, body {
+    height: 100%;
+}
+
+#container {
+    height: 1000px;
+}
+
 .svg_box {
     fill-opacity: 0%;
     fill: none;
@@ -42,9 +50,4 @@
 .svg_level_4 .svg_text {
     fill: #202020;
     stroke: white;
-}
-
-#container {
-    width: 900px;
-    height: 800px;
 }
