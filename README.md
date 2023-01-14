@@ -1,5 +1,8 @@
 # Git-Heat-Map
 
+![Map showing the cpython repositiory, highlighting the files that Guido van Rossum changed the most](example_image.png)
+*Map showing the cpython repositiory, highlighting the files that Guido van Rossum changed the most (excluding the configure file in the root directory)*
+
 ## Basic use guide
 
 * Generate database with `./generate-db.sh {path_to_repo_dir}`

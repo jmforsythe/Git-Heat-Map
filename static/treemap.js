@@ -122,8 +122,8 @@ function squarify(x, y, width, height, children_in, parent_path, level, SVG_ROOT
 
 function fraction_to_saturation_and_lightness(fraction) {
     let percentage = fraction*100
-    sat_x1 = 0.5
-    sat_x0 = 50
+    sat_x1 = 0.3
+    sat_x0 = 70
     light_x1 = -0.3
     light_x0 = 80
     return [sat_x1*percentage+sat_x0, light_x1*percentage+light_x0]
@@ -150,7 +150,7 @@ function highlight_obj_child(obj, hue, path, highest) {
 
 function get_highest_leaf_in_obj(obj) {
     if ("children" in obj) {
-        return Math.max(...obj.children.map((val) => val.val))
+        return Math.max(...obj.children.map((val) => get_highest_leaf_in_obj(val)))
     } else {
         return obj.val
     }
