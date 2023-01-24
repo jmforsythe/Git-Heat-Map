@@ -43,7 +43,8 @@ function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
             if (row_width > 0 && box_height > 0) {
                 if (NEST && "children" in val) squarify(x, y, row_width, box_height, val.children, `${parent_path}/${val.name}`, level+1, SVG_ROOT)
                 SVG_ROOT.appendChild(get_box_text_element(
-                    {"x": x, "y": y, "width": row_width, "height": box_height, "text": val.name, "parent": parent_path, "level": level, "leaf": !(NEST && "children" in val)}))
+                    {"area": box_area, "x": x, "y": y, "width": row_width, "height": box_height, "text": val.name,
+                     "parent": parent_path, "level": level, "leaf": !(NEST && "children" in val)}))
                 y += box_height
             }
         } else {
@@ -52,7 +53,8 @@ function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
             if (row_height > 0 && box_width > 0) {
                 if (NEST && "children" in val) squarify(x, y, box_width, row_height, val.children, `${parent_path}/${val.name}`, level+1, SVG_ROOT)
                 SVG_ROOT.appendChild(get_box_text_element(
-                    {"x": x, "y": y, "width": box_width, "height": row_height, "text": val.name, "parent": parent_path, "level": level, "leaf": !(NEST && "children" in val)}))
+                    {"area": box_area, "x": x, "y": y, "width": box_width, "height": row_height, "text": val.name,
+                     "parent": parent_path, "level": level, "leaf": !(NEST && "children" in val)}))
                 x += box_width
             }
         }
@@ -63,6 +65,7 @@ function get_box_text_element(obj) {
     let element = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
     let text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+    let title = document.createElementNS('http://www.w3.org/2000/svg', 'title')
 
     element.setAttribute("x", `${obj.x}`)
     element.setAttribute("y", `${obj.y}`)
@@ -88,14 +91,18 @@ function get_box_text_element(obj) {
     text.setAttribute("font-size", `${font_size}`)
     text.setAttribute("stroke-width", `${font_size/100}`)
 
+    const title_txt = document.createTextNode(`${obj.area}\n${path}`)
+    title.appendChild(title_txt)
+
     if (obj.level == 0) {
-        box.onclick = () => {console.log(path); display_filetree_path(filetree_obj_global, highlighting_obj_global, path)}
+        element.onclick = () => display_filetree_path(filetree_obj_global, highlighting_obj_global, path)
         element.onmouseover = () => box.classList.add("svg_box_selected")
         element.onmouseout = () => box.classList.remove("svg_box_selected")
     }
 
     element.appendChild(box)
     element.appendChild(text)
+    element.appendChild(title)
     return element
 }
 
@@ -132,14 +139,16 @@ function squarify(x, y, width, height, children_in, parent_path, level, SVG_ROOT
 
 function fraction_to_saturation_and_lightness(fraction) {
     let percentage = fraction*100
-    sat_x1 = 0.3
-    sat_x0 = 70
-    light_x1 = -0.3
-    light_x0 = 80
+    sat_x1 = 0.5
+    sat_x0 = 40
+    light_x1 = -0.5
+    light_x0 = 100
     return [sat_x1*percentage+sat_x0, light_x1*percentage+light_x0]
 }
 
-function highlight_node(path, hue, fraction) {
+function highlight_node(path, hue, this_val, max_val) {
+    if (this_val == 0 || max_val <= 1) return
+    fraction = Math.log(this_val) / Math.log(max_val)
     let svg = document.getElementById(`svg_path_${path}`)
     if (!svg) return 
     let rect = svg.querySelector(".svg_box")
@@ -154,7 +163,7 @@ function highlight_obj_child(obj, hue, path, highest) {
         if ("children" in val) {
             highlight_obj_child(val, hue, `${path}/${val.name}`, highest)
         } else {
-            highlight_node(`${path}/${val.name}`, hue, val.val/highest)
+            highlight_node(`${path}/${val.name}`, hue, val.val, highest)
         }
     })
 }
@@ -170,7 +179,7 @@ function get_highest_leaf_in_obj(obj) {
 function highlight_obj(obj, hue, path) {
     if (!obj) return
     const highest = get_highest_leaf_in_obj(obj)
-    highlight_obj_child(obj, hue, path, highest)
+    highlight_obj_child(obj, hue, path, (obj.val+highest)/2)
 }
 
 function delete_children(node) {
@@ -190,7 +199,6 @@ function get_child_from_path(obj, path) {
     const index = path.indexOf("/")
     if (index == -1) {
         desired_child = obj.children.filter((child) => child.name == path)
-        console.log(desired_child)
         if (desired_child.length == 1) {
             return desired_child[0]
         }
@@ -204,7 +212,6 @@ function get_child_from_path(obj, path) {
 
 function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, cur_path) {
     delete_children(SVG_ROOT)
-    console.log(filetree_obj)
     const area = filetree_obj.val
     const width = Math.sqrt(area*aspect_ratio)
     const height = area / width
