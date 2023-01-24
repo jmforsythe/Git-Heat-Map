@@ -3,28 +3,24 @@ html, body {
 }
 
 #container {
-    height: 1000px;
+    height: 900px;
 }
 
 .svg_box {
-    fill-opacity: 0%;
-    fill: none;
-    stroke: green;
-    stroke-width: 1%;
-    stroke-opacity: 100%;
+    fill: "url(#Gradient2)";
     width: 100%;
     height: 100%;
+}
+
+.svg_box_selected {
+    stroke: blue;
+    stroke-width: 2%;
 }
 
 .svg_text {
     fill: none;
     stroke: none;
     font-family: Helvetica, "Trebuchet MS", Verdana, sans-serif;
-}
-
-.svg_leaf .svg_box {
-    fill: lightgrey;
-    fill-opacity: 100%;
 }
 
 .svg_level_0 .svg_text {
@@ -49,5 +45,65 @@ html, body {
 
 .svg_level_4 .svg_text {
     fill: #202020;
+    stroke: white;
+}
+
+.svg_level_5 .svg_text {
+    fill: #282828;
+    stroke: white;
+}
+
+.svg_level_6 .svg_text {
+    fill: #303030;
+    stroke: white;
+}
+
+.svg_level_7 .svg_text {
+    fill: #383838;
+    stroke: white;
+}
+
+.svg_level_8 .svg_text {
+    fill: #404040;
+    stroke: white;
+}
+
+.svg_level_9 .svg_text {
+    fill: #484848;
+    stroke: white;
+}
+
+.svg_level_10 .svg_text {
+    fill: #505050;
+    stroke: white;
+}
+
+.svg_level_11 .svg_text {
+    fill: #585858;
+    stroke: white;
+}
+
+.svg_level_12 .svg_text {
+    fill: #606060;
+    stroke: white;
+}
+
+.svg_level_13 .svg_text {
+    fill: #686868;
+    stroke: white;
+}
+
+.svg_level_14 .svg_text {
+    fill: #707070;
+    stroke: white;
+}
+
+.svg_level_15 .svg_text {
+    fill: #787878;
+    stroke: white;
+}
+
+.svg_level_16 .svg_text {
+    fill: #808080;
     stroke: white;
 }

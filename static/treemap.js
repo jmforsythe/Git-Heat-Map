@@ -29,12 +29,14 @@ function worst(R, w) {
 }
 
 NEST = true
+MIN_AREA = 0
 function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
     if (width == 0 || height == 0) return
     let row_area = row.reduce((acc, cur) => acc+cur.val, 0)
     next_to_do = []
     row.forEach((val, index, array) => {
         let box_area = val.val
+        if (box_area < MIN_AREA) return
         if (width >= height) {
             const row_width = row_area / height
             const box_height = box_area / row_width
@@ -70,8 +72,10 @@ function get_box_text_element(obj) {
     if (obj.leaf) element.classList.add("svg_leaf")
     const path = `${obj.parent}/${obj.text}`
     element.setAttribute("id", `svg_path_${path}`)
-    
+
     box.classList.add("svg_box")
+    box.setAttribute("fill", "url(#Gradient2)")
+    box.setAttribute("fill-opacity", "20%")
 
     const txt = document.createTextNode(obj.text)
     text.appendChild(txt)
@@ -84,6 +88,12 @@ function get_box_text_element(obj) {
     text.setAttribute("font-size", `${font_size}`)
     text.setAttribute("stroke-width", `${font_size/100}`)
 
+    if (obj.level == 0) {
+        box.onclick = () => {console.log(path); display_filetree_path(filetree_obj_global, highlighting_obj_global, path)}
+        element.onmouseover = () => box.classList.add("svg_box_selected")
+        element.onmouseout = () => box.classList.remove("svg_box_selected")
+    }
+
     element.appendChild(box)
     element.appendChild(text)
     return element
@@ -93,7 +103,7 @@ function squarify(x, y, width, height, children_in, parent_path, level, SVG_ROOT
     const children = children_in
     width = Math.max(0,width)
     height = Math.max(0,height)
-    if (children.length == 0) {
+    if (!children || children.length == 0) {
         return
     }
     let size = width >= height ? height : width
@@ -135,11 +145,12 @@ function highlight_node(path, hue, fraction) {
     let rect = svg.querySelector(".svg_box")
     if (!rect) return
     [saturation, lightness] = fraction_to_saturation_and_lightness(fraction)
-    svg.querySelector(".svg_box").style["fill"] = `hsl(${hue},${saturation}%,${lightness}%)`
+    rect.style["fill"] = `hsl(${hue},${saturation}%,${lightness}%)`
+    rect.style["fill-opacity"] = "100%"
 }
 
 function highlight_obj_child(obj, hue, path, highest) {
-    obj.children.forEach((val, index, array) => {
+    if ("children" in obj) obj.children.forEach((val, index, array) => {
         if ("children" in val) {
             highlight_obj_child(val, hue, `${path}/${val.name}`, highest)
         } else {
@@ -156,18 +167,25 @@ function get_highest_leaf_in_obj(obj) {
     }
 }
 
-function highlight_obj(obj, hue) {
+function highlight_obj(obj, hue, path) {
+    if (!obj) return
     const highest = get_highest_leaf_in_obj(obj)
-    highlight_obj_child(obj, hue, "", highest)
+    highlight_obj_child(obj, hue, path, highest)
 }
 
 function delete_children(node) {
+    let defs = []
     while (node.firstChild) {
+        if (node.lastChild.nodeName == "defs") {
+            defs.push(node.lastChild)
+        }
         node.removeChild(node.lastChild)
     }
+    defs.forEach((def) => node.appendChild(def))
 }
 
 function get_child_from_path(obj, path) {
+    if (path[0] == "/") path = path.slice(1)
     if (path == "") return obj
     const index = path.indexOf("/")
     if (index == -1) {
@@ -184,38 +202,47 @@ function get_child_from_path(obj, path) {
     }
 }
 
-function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio) {
+function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, cur_path) {
     delete_children(SVG_ROOT)
-
+    console.log(filetree_obj)
     const area = filetree_obj.val
     const width = Math.sqrt(area*aspect_ratio)
     const height = area / width
 
+    MIN_AREA = area / 5000
+
     SVG_ROOT.setAttribute("viewBox", `0 0 ${width} ${height}`)
-    squarify(x,y,width,height,filetree_obj.children,"",0, SVG_ROOT)
-    highlight_obj(highlighting_obj, 0)
+    if ("children" in filetree_obj) {
+        squarify(x,y,width,height,filetree_obj.children, cur_path, 0, SVG_ROOT)
+    } else {
+        handle_row([filetree_obj], x, y, width, height, cur_path, 0, SVG_ROOT)
+    }
+    highlight_obj(highlighting_obj, 0, cur_path)
 }
 
-function display_filetree_path(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, path) {
-    display_filetree(get_child_from_path(filetree_obj, path), get_child_from_path(highlighting_obj, path), SVG_ROOT, x, y, aspect_ratio)
+function display_filetree_path(filetree_obj, highlighting_obj, path) {
+    const [SVG_ROOT, x, y, aspect_ratio] = get_drawing_params()
+    display_filetree(get_child_from_path(filetree_obj, path), get_child_from_path(highlighting_obj, path), SVG_ROOT, x, y, aspect_ratio, path)
 }
 
-function main() {
-    const filetree_obj = JSON.parse(loadFile("filetree.json"))
-    const highlighting_obj = JSON.parse(loadFile("highlight.json"))
-    sort_by_val(filetree_obj)
-
-    let SVG_ROOT = document.getElementById("jk")
+function get_drawing_params() {
+    const SVG_ROOT = document.getElementById("treemap_root_svg")
     const vw = Math.max(SVG_ROOT.clientWidth || 0, SVG_ROOT.innerWidth || 0)
     const vh = Math.max(SVG_ROOT.clientHeight || 0, SVG_ROOT.innerHeight || 0)
     const aspect_ratio = vw/vh
-
     const x = 0
     const y = 0
-
-    path_to_display = ""
-
-    display_filetree_path(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, path_to_display)
+    return [SVG_ROOT, x, y, aspect_ratio]
 }
+
+function main() {
+    path_to_display = ""
+    display_filetree_path(filetree_obj_global, highlighting_obj_global, path_to_display)
+}
+
+const filetree_obj_global = JSON.parse(loadFile("filetree.json"))
+sort_by_val(filetree_obj_global)
+
+const highlighting_obj_global = JSON.parse(loadFile("highlight.json"))
 
 main()
