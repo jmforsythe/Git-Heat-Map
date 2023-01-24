@@ -223,6 +223,10 @@ def handle_match(cur, match, secondary_line, fields):
 def get_line_stdin():
     return sys.stdin.readline()
 
+def create_indices(cur):
+    cur.execute("CREATE INDEX if not exists commitFileID ON commitFile (fileID)")
+    cur.execute("CREATE INDEX if not exists commitAuthorEmail ON commitAuthor (authorEmail)")
+
 def main():
     con, database_path = db_connection(sys.argv)
     cur = con.cursor()
@@ -232,7 +236,7 @@ def main():
     lines = []
 
     # Needed to stop encoding errors
-    sys.stdin.reconfigure(encoding='utf-8')
+    sys.stdin.reconfigure(encoding='ISO-8859-1')
     sys.stdout.reconfigure(encoding='utf-8')
 
     while l := get_line_stdin():
@@ -245,6 +249,8 @@ def main():
         else:
             lines.append(line)
     last_commit = handle_commit(cur, lines)
+
+    create_indices(cur)
 
     con.commit()
     con.close()
