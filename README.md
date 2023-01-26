@@ -6,11 +6,9 @@
 ## Basic use guide
 
 * Generate database with `./generate-db.sh {path_to_repo_dir}`
-* Generate filetree json with `python databaseToJSON.py {name_of_repo}.db > filetree.json`
-* Add the emails you'd like to search for to the example emails list in `databaseToJSONFiltered.py`
-* Generate highlighting json with `python databaseToJSONFiltered.py {name_of_repo}.db > filetree.json`
 * Run web server with `python flask_app.py` (flask must be installed, can be install from pip)
-* Connect on `127.0.0.1:5000`
+* Connect on `127.0.0.1:5000/{name_of_repo}`
+* Select email to search for in the form at the bottom and click submit
 
 This project consists of two parts:
 
