@@ -9,13 +9,13 @@ WHERE files.filePath NOTNULL
 GROUP BY files.filePath
 """
 
-def get_json_from_db(database_name, query=get_files_SQL):
+def get_json_from_db(database_name, query=get_files_SQL, params=tuple()):
     con = sqlite3.connect(database_name)
     cur = con.cursor()
 
     file_dict = {}
 
-    cur.execute(query)
+    cur.execute(query, params)
     while line := cur.fetchone():
         file_dict[line[0]] = line[1]
 

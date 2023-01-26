@@ -1,12 +1,17 @@
-function loadFile(filePath) {
-    var result = null;
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.open("GET", filePath, false);
-    xmlhttp.send();
-    if (xmlhttp.status==200) {
-        result = xmlhttp.responseText;
+function loadFile(filePath, paramsObj) {
+    let result = null
+    let xmlhttp = new XMLHttpRequest()
+    const searchParams = new URLSearchParams()
+    for (const key in paramsObj) {
+        paramsObj[key].forEach((value) => searchParams.append(key, value))
     }
-    return result;
+    if (searchParams.toString() != "") filePath += `?${searchParams.toString()}`
+    xmlhttp.open("GET", filePath, false)
+    xmlhttp.send()
+    if (xmlhttp.status==200) {
+        result = xmlhttp.responseText
+    }
+    return result
 }
 
 function sort_by_val(j) {
@@ -87,15 +92,18 @@ function get_box_text_element(obj) {
     text.setAttribute("y", "50%")
     text.setAttribute("dominant-baseline", "middle")
     text.setAttribute("text-anchor", "middle")
-    let font_size = Math.min(1.5*obj.width/obj.text.length, 1.7*obj.height)
+    let font_size = Math.min(1.5*obj.width/obj.text.length, 1*obj.height)
     text.setAttribute("font-size", `${font_size}`)
-    text.setAttribute("stroke-width", `${font_size/100}`)
+    text.setAttribute("stroke-width", `${font_size/80}`)
 
     const title_txt = document.createTextNode(`${obj.area}\n${path}`)
     title.appendChild(title_txt)
 
     if (obj.level == 0) {
-        element.onclick = () => display_filetree_path(filetree_obj_global, highlighting_obj_global, path)
+        if (!obj.leaf) element.onclick = () => {
+            back_stack.push(obj.parent)
+            display_filetree_path(filetree_obj_global, highlighting_obj_global, path)
+        }
         element.onmouseover = () => box.classList.add("svg_box_selected")
         element.onmouseout = () => box.classList.remove("svg_box_selected")
     }
@@ -151,21 +159,31 @@ function highlight_node(path, hue, this_val, max_val) {
     fraction = Math.log(this_val) / Math.log(max_val)
     let svg = document.getElementById(`svg_path_${path}`)
     if (!svg) return 
+
     let rect = svg.querySelector(".svg_box")
-    if (!rect) return
-    [saturation, lightness] = fraction_to_saturation_and_lightness(fraction)
-    rect.style["fill"] = `hsl(${hue},${saturation}%,${lightness}%)`
-    rect.style["fill-opacity"] = "100%"
+    if (rect) {
+        [saturation, lightness] = fraction_to_saturation_and_lightness(fraction)
+        rect.style["fill"] = `hsl(${hue},${saturation}%,${lightness}%)`
+        rect.style["fill-opacity"] = "100%"
+    }
 }
 
 function highlight_obj_child(obj, hue, path, highest) {
-    if ("children" in obj) obj.children.forEach((val, index, array) => {
-        if ("children" in val) {
-            highlight_obj_child(val, hue, `${path}/${val.name}`, highest)
-        } else {
-            highlight_node(`${path}/${val.name}`, hue, val.val, highest)
+    if ("children" in obj) {
+        obj.children.forEach((child) => {
+            highlight_obj_child(child, hue, `${path}/${child.name}`, highest)
+        })
+    } else {
+        highlight_node(`${path}`, hue, obj.val, highest)
+    }
+
+    let svg = document.getElementById(`svg_path_${path}`)
+    if (svg) {
+        let alt_text = svg.querySelector("title")
+        if (alt_text) {
+            alt_text.textContent = alt_text.textContent.concat(`\n${obj.val}`)
         }
-    })
+    }
 }
 
 function get_highest_leaf_in_obj(obj) {
@@ -179,7 +197,7 @@ function get_highest_leaf_in_obj(obj) {
 function highlight_obj(obj, hue, path) {
     if (!obj) return
     const highest = get_highest_leaf_in_obj(obj)
-    highlight_obj_child(obj, hue, path, (obj.val+highest)/2)
+    highlight_obj_child(obj, hue, path, highest)
 }
 
 function delete_children(node) {
@@ -242,14 +260,43 @@ function get_drawing_params() {
     return [SVG_ROOT, x, y, aspect_ratio]
 }
 
-function main() {
-    path_to_display = ""
-    display_filetree_path(filetree_obj_global, highlighting_obj_global, path_to_display)
+function back_button_setup() {
+    let back_button = document.getElementById("back-button")
+    if (back_button) {
+        back_button.onclick = () => {
+            path = back_stack.pop()
+            if (path == null) path = ""
+            display_filetree_path(filetree_obj_global, highlighting_obj_global, path)
+        }
+    }
 }
 
-const filetree_obj_global = JSON.parse(loadFile("filetree.json"))
-sort_by_val(filetree_obj_global)
+function email_entry_setup() {
+    let email_entry = document.getElementById("email-entry")
+    let email_submit = document.getElementById("email-submit")
+    if (email_entry && email_submit) {
+        const func = () => {display_filetree_with_params({}, {"emails": [email_entry.value]}); return false}
+        email_submit.onclick = func
+        email_submit.onsubmit = func
+    }
+}
 
-const highlighting_obj_global = JSON.parse(loadFile("highlight.json"))
+function display_filetree_with_params(filetree_params, highlight_params) {
+    filetree_obj_global = JSON.parse(loadFile(`filetree/${DATABASE_NAME}.json`, filetree_params))
+    sort_by_val(filetree_obj_global)
+    highlighting_obj_global = JSON.parse(loadFile(`highlight/${DATABASE_NAME}.json`, highlight_params))
+    back_stack = []
+    display_filetree_path(filetree_obj_global, highlighting_obj_global, "")
+}
+
+function main() {
+    display_filetree_with_params({}, {})
+    back_button_setup()
+    email_entry_setup()
+}
+
+let filetree_obj_global
+let highlighting_obj_global
+let back_stack = []
 
 main()

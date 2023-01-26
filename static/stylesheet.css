@@ -3,7 +3,8 @@ html, body {
 }
 
 #container {
-    height: 900px;
+    height: 90%;
+    width: 90%
 }
 
 .svg_box {
@@ -15,6 +16,10 @@ html, body {
 .svg_box_selected {
     stroke: blue;
     stroke-width: 2%;
+}
+
+.svg_leaf .svg_box_selected {
+    stroke: lightblue;
 }
 
 .svg_text {

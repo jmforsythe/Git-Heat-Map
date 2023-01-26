@@ -1,14 +1,24 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+import databaseToJSON
+import databaseToJSONFiltered
 
 app = Flask(__name__)
 app.static_folder = "static"
 
-@app.route("/")
-def main_page():
-    return render_template("index.html")
+@app.route("/<name>")
+def main_page(name):
+    return render_template("index.html", name=name)
 
-@app.route("/<name>.json")
-def get_json(name=None):
-    return open(f"{name}.json").read()
+@app.route("/filetree/<name>.json")
+def filetree_json(name):
+    return databaseToJSON.get_json_from_db(f"{name}.db")
+
+@app.route("/highlight/<name>.json")
+def highight_json(name):
+    params = {}
+    emails = request.args.getlist("emails")
+    params["emails"] = emails
+    query, params = databaseToJSONFiltered.get_filtered_query(params)
+    return databaseToJSON.get_json_from_db(f"{name}.db", query, params)
 
 app.run()

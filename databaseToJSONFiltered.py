@@ -4,7 +4,6 @@ example_filter = {
     "emails": ["%"]
 }
 
-# This is not sanitised at all, need to replace with adding sql parameters
 def get_filtered_query(filter=example_filter):
     query = """
         SELECT files.filePath, SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved)
@@ -13,13 +12,15 @@ def get_filtered_query(filter=example_filter):
         WHERE files.filePath NOTNULL WHERE_LINE
         GROUP BY files.filePath
     """
-    if "emails" in filter and filter["emails"]:
+    params = []
+    if "emails" in filter:
         query = query.replace("JOIN_LINE", "JOIN commitAuthor on commitFile.hash = commitAuthor.hash")
-        query = query.replace("WHERE_LINE", "AND ("+" OR ".join([f"commitAuthor.authorEmail LIKE \"{email}\"" for email in filter["emails"]]) + ")")
+        query = query.replace("WHERE_LINE", "AND ("+" OR ".join(["0"]+[f"commitAuthor.authorEmail LIKE ?" for email in filter["emails"]]) + ")")
+        params.extend(filter["emails"])
     else:
         query = query.replace("JOIN_LINE", "")
         query = query.replace("WHERE_LINE", "")
-    return query
+    return query, tuple(params)
 
 if __name__ == "__main__":
     import sys
@@ -27,4 +28,6 @@ if __name__ == "__main__":
     sys.stdin.reconfigure(encoding='utf-8')
     sys.stdout.reconfigure(encoding='utf-8')
     if len(sys.argv) > 1:
-        print(databaseToJSON.get_json_from_db(sys.argv[1], get_filtered_query()))
+        query, params = get_filtered_query()
+        print(query, params)
+        print(databaseToJSON.get_json_from_db(sys.argv[1], query, params))
