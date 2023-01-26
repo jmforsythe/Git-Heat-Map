@@ -23,6 +23,8 @@ Scans through an entire git history using `git log`, and creates a database usin
 * *Files*, which just keeps track of filenames
 * *Commits*, which stores commit hash, author, committer
 * *CommitFile*, which stores an instance of a certain file being changed by a certain commit, and tracks how many lines were added/removed by that commit
+* *Author*, which stores an author name and email
+* *CommitAuthor*, which links commits and Author in order to support coauthors on commits
 
 Using these we can keep track of which files/commits changed the repository the most, which in itself can provide useful insight
 
@@ -34,7 +36,3 @@ Currently the only submodule changes that can be seen are the top level commit p
 ## Database -> treemap
 
 Taking the database above, shall calculate a [treemap](https://en.wikipedia.org/wiki/Treemapping "Wikipedia: Treemapping") of the file system, with the size of each directory being the sum of the sizes of the files contained within, and the size of each file being either the size on disk, or the number of changed lines of code across all commits in the database.
-
-### Planned features
-
-#### Filtering by author(s) to see which areas of a codebase people touch most
