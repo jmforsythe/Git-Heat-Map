@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}">
+        <title>{{ name }}</title>
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheets/treemap.css') }}">
     </head>
     <body>
         <div id="container">
@@ -18,7 +19,7 @@
         <input type="button" value="Back" id="back-button"/>
         <input type="text" name="emails" id="email-entry"/>
         <input type="button" value="Submit" id="email-submit"/>
-        <script>DATABASE_NAME = "{{ name }}"; QUERY_STRING = "{{ query_args }}"</script>
-        <script src="{{ url_for('static', filename='treemap.js') }}"></script>
+        <script>const DATABASE_NAME = "{{ name }}"; const QUERY_STRING = "{{ query_args }}"</script>
+        <script src="{{ url_for('static', filename='javascript/treemap.js') }}"></script>
     </body>
 </html>

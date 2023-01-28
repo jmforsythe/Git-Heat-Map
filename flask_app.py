@@ -6,8 +6,8 @@ app = Flask(__name__)
 app.static_folder = "static"
 
 @app.route("/<name>")
-def main_page(name):
-    return render_template("index.html", name=name)
+def treemap_page(name):
+    return render_template("treemap.html", name=name)
 
 @app.route("/filetree/<name>.json")
 def filetree_json(name):
