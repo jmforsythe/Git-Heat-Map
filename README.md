@@ -1,7 +1,7 @@
 # Git-Heat-Map
 
 ![Map showing the cpython repositiory, highlighting the files that Guido van Rossum changed the most](example_image.png)
-*Map showing the cpython repositiory, highlighting the files that Guido van Rossum changed the most (excluding the configure file in the root directory)*
+*Map showing the cpython repositiory, highlighting the files that Guido van Rossum changed the most*
 
 ## Basic use guide
 
@@ -65,6 +65,8 @@ For this test I filtered each repo by its most prominent authors:
 | linux | torvalds@linux-foundation.org | 45.4 seconds |
 | cpython | guido@python.org | 1.9 seconds |
 
+Currently `treemap.js` uses a global variable `MIN_AREA` to not render smallest files for better performance.
+
 While these performances are not as fast as desired, a more typically sized repo should perform fine.
 
 ## Wanted features
@@ -76,4 +78,13 @@ Currently the only submodule changes that can be seen are the top level commit p
 Currently done using git log which can take a very long time for large repos. Will look into any other ways of getting needed information on files.
 
 ### Asynchronous javascript
-Currently no async functions are used. I believe the performance of the webpage could be imporved if things such as file loading and svg drawing was done asynchronously
+Currently no async functions are used. I believe the performance of the webpage could be imporved if things such as file loading and svg drawing was done asynchronously.
+
+### Remembering filters
+Filters must be re-entered every time the page is loaded. Ideally filters would be remembered either through cookies or by storing the filters as a url query, which would allow users to bookmark queries.
+
+### Filter builder sidebar
+Current interface is very barebones. Want to have a sidebar that will allow users to select authors, date ranges, etc, to control the highlighting.
+
+### Selectable colours per author
+Currently red is hardcoded for all results. In order to show multiple authors we want to highlight in different colours, will need to decide how to colour files edited by both authors.
