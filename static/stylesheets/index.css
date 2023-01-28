@@ -1,0 +1,16 @@
+#content {
+    max-width: 500px;
+    margin: auto;
+    text-align: center;
+}
+
+h1 {
+    text-align: center;
+    align-self: center;
+}
+
+ul {
+    display: inline-block;
+    list-style: none inside none;
+    padding: 0;
+}
