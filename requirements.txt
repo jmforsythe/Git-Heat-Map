@@ -1,0 +1,2 @@
+pysqlite3==0.5.0
+flask==2.2.2

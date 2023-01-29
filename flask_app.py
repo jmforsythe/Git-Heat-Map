@@ -27,4 +27,4 @@ def highight_json(name):
     query, params = databaseToJSONFiltered.get_filtered_query(params)
     return databaseToJSON.get_json_from_db(f"{name}.db", query, params)
 
-app.run()
+app.run(host='0.0.0.0')
