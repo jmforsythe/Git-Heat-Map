@@ -1,6 +1,31 @@
 import fileTree
 import sqlite3
 
+example_filter = {
+    "emails": []
+}
+
+def get_filtered_query(filter=example_filter):
+    base_query = """
+        SELECT files.filePath, SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved)
+        FROM files
+        JOIN commitFile on files.fileID = commitFile.fileID JOIN_LINE
+        WHERE WHERE_LINE
+        GROUP BY files.filePath
+    """
+    params = []
+    joins = set()
+    wheres = set()
+    wheres.add("files.filePath NOTNULL")
+
+    if "emails" in filter:
+        joins.add("JOIN commitAuthor on commitFile.hash = commitAuthor.hash")
+        wheres.add("(" + " OR ".join(["0"] + [f"commitAuthor.authorEmail LIKE ?" for email in filter["emails"]]) + ")")
+        params.extend(filter["emails"])
+
+    query = base_query.replace("JOIN_LINE", " ".join(joins)).replace("WHERE_LINE", " AND ".join(wheres))
+    return query, tuple(params)
+
 get_files_SQL = """
 SELECT files.filePath, SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved)
 FROM files
