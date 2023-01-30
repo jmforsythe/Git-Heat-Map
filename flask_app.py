@@ -1,7 +1,9 @@
+import glob
+import functools
+
 from flask import Flask, render_template, request
 import databaseToJSON
 import databaseToJSONFiltered
-import glob
 
 app = Flask(__name__)
 app.static_folder = "static"
@@ -23,8 +25,15 @@ def filetree_json(name):
 def highight_json(name):
     params = {}
     emails = request.args.getlist("emails")
-    params["emails"] = emails
-    query, params = databaseToJSONFiltered.get_filtered_query(params)
-    return databaseToJSON.get_json_from_db(f"{name}.db", query, params)
+    params["emails"] = tuple(emails)
+    params_frozen = frozenset(params.items())
+
+    return get_highlight_json(name, params_frozen)
+
+@functools.lru_cache(maxsize=100)
+def get_highlight_json(name, params):
+    params_dict = {a[0]: a[1] for a in params}
+    query, sql_params = databaseToJSONFiltered.get_filtered_query(params_dict)
+    return databaseToJSON.get_json_from_db(f"{name}.db", query, sql_params)
 
 app.run()
