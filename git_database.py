@@ -155,29 +155,33 @@ def commitAuthor_create(cur, hash, email):
 def handle_commit(cur, commit_lines):
     if len(commit_lines) <= 1:
         return
+    encoding = commit_lines[0].split(COMMIT_SPLIT_SYMBOL.encode())[-2].decode()
+    if encoding == "":
+        encoding = "utf-8"
+
     keys = ("hash", "authorName", "authorEmail", "authorDate", "committerName", "committerEmail", "committerDate")
-    first_line_sep = commit_lines[0][1:].split(COMMIT_SPLIT_SYMBOL)
+    first_line_sep = commit_lines[0][1:].decode(encoding, errors="replace").split(COMMIT_SPLIT_SYMBOL)
     fields = {keys[i] : first_line_sep[i]
               for i in range(len(keys))}
     commit_create(cur, fields)
     author_create(cur, fields["authorEmail"], fields["authorName"])
     commitAuthor_create(cur, fields["hash"], fields["authorEmail"])
-    for i in range(len(keys), len(first_line_sep)):
+    for i in range(len(keys), len(first_line_sep)-2):
         if x := re.match(r"(.*) <(.*)>", first_line_sep[i]):
             name, email = x.groups()
             author_create(cur, email, name)
             commitAuthor_create(cur, fields["hash"], email)
 
-    numstat_line = commit_lines[1]
+    numstat_line = commit_lines[1].decode(encoding)
     matches = regex_numstat_z.findall(numstat_line)
     # First commit in --compact-summary is on the end of previous line
     first_secondary_line = numstat_line.split("\0")[-1]
-    commit_lines.insert(2, first_secondary_line)
+    commit_lines.insert(2, first_secondary_line.encode(encoding))
     for i in range(len(matches)):
         try:
-            handle_match(cur, matches[i], commit_lines[2+i], fields)
+            handle_match(cur, matches[i], commit_lines[2+i].decode(encoding), fields)
         except:
-            print(matches[i], commit_lines[2+i])
+            print(matches[i], commit_lines[2+i].decode(encoding))
             raise
     return fields["hash"]
 
@@ -220,44 +224,9 @@ def handle_match(cur, match, secondary_line, fields):
     if re.match(r"(.*)\(gone\)$", second_path):
         file_delete(cur, file_path)
 
-def get_line_stdin():
-    return sys.stdin.readline()
+def get_next_line(log_output):
+    return log_output.readline()
 
 def create_indices(cur):
     cur.execute("CREATE INDEX if not exists commitFileID ON commitFile (fileID)")
     cur.execute("CREATE INDEX if not exists commitAuthorEmail ON commitAuthor (authorEmail)")
-
-def main():
-    con, database_path = db_connection(sys.argv)
-    cur = con.cursor()
-
-    create_tables(cur)
-
-    lines = []
-
-    # Needed to stop encoding errors
-    sys.stdin.reconfigure(encoding='ISO-8859-1')
-    sys.stdout.reconfigure(encoding='utf-8')
-
-    while l := get_line_stdin():
-        line = l.rstrip()
-        if len(line) == 0:
-            continue
-        if line[0] == COMMIT_START_SYMBOL:
-            last_commit = handle_commit(cur, lines)
-            lines = [line]
-        else:
-            lines.append(line)
-    last_commit = handle_commit(cur, lines)
-
-    create_indices(cur)
-
-    con.commit()
-    con.close()
-
-    if last_commit != None:
-        with open(f"{database_path[:-3]}_lastcommit.txt", "w") as lc:
-            lc.write(last_commit)
-
-if __name__ == "__main__":
-    main()

@@ -5,18 +5,20 @@
 
 ## Basic use guide
 
-* Generate database with `./generate-db.sh {path_to_repo_dir}`
+* Generate database with `python generate_db.py {path_to_repo_dir}`
 * Run web server with `python flask_app.py` (flask must be installed, can be install from pip)
 * Connect on `127.0.0.1:5000`
 * Available repos will be displayed, select the one you want to view
 * Select email to search for in the form at the bottom and click submit
+
+## Project Structure
 
 This project consists of two parts:
 
 1. Git log -> database
 2. Database -> treemap
 
-## Git log -> database
+### Git log -> database
 
 Scans through an entire git history using `git log`, and creates a database using three tables:
 * *Files*, which just keeps track of filenames
@@ -27,7 +29,7 @@ Scans through an entire git history using `git log`, and creates a database usin
 
 Using these we can keep track of which files/commits changed the repository the most, which in itself can provide useful insight
 
-## Database -> treemap
+### Database -> treemap
 
 Taking the database above, uses an SQL query to generate a JSON object with the following structure: 
 ```
