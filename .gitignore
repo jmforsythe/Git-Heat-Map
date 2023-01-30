@@ -3,3 +3,4 @@
 scratchpad.sql
 __pycache__/
 *.json
+*.log
