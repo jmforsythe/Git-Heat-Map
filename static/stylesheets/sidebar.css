@@ -1,0 +1,43 @@
+#sidebar {
+    background-color: #707070;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 10%;
+    align-items: center;
+}
+
+.sidebar_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10%;
+    width: 100%;
+    border: 2px solid black;
+    box-sizing: border-box;
+}
+
+.sidebar_container:last-of-type {
+    margin-top: auto;
+    margin-bottom: 10%;
+}
+
+input {
+    width: 90%;
+}
+
+input[type=text] {
+    box-sizing: border-box;
+}
+
+.item_list {
+    width: 100%;
+}
+
+.list_item {
+    border: 2px solid black;
+    word-break: break-all;
+    width: 100%;
+    min-height: 1em;
+}

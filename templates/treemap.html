@@ -3,6 +3,7 @@
     <head>
         <title>{{ name }}</title>
         <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheets/treemap.css') }}">
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheets/sidebar.css') }}">
     </head>
     <body>
         <div id="container">
@@ -17,17 +18,20 @@
             </svg>
         </div>
         <div id="sidebar">
-            <div class="sidebar_container">
+            <div class="sidebar_container" id="email_filter">
                 Email filter
-                <input type="text" name="emails" id="email-entry"/>
-                <input type="button" value="Submit" id="email-submit"/>
+                <input type="text" name="emails" class="text_entry"/>
+                <input type="button" value="Add email" class="text_submit"/>
+                <div class="item_list"></div>
             </div>
             <div class="sidebar_container">
-                <input type="button" value="Back" id="back-button"/>
+                <input type="button" value="Submit query" id="submit_query"/>
+                <input type="button" value="Back" id="back_button"/>
                 <a href="/">Index</a>
             </div>
         </div>
         <script>const DATABASE_NAME = "{{ name }}"; const QUERY_STRING = "{{ query_args }}"</script>
         <script src="{{ url_for('static', filename='javascript/treemap.js') }}"></script>
+        <script src="{{ url_for('static', filename='javascript/sidebar.js') }}"></script>
     </body>
 </html>

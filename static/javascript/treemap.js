@@ -260,33 +260,6 @@ function get_drawing_params() {
     return [SVG_ROOT, x, y, aspect_ratio]
 }
 
-function back_button_setup() {
-    let back_button = document.getElementById("back-button")
-    if (back_button) {
-        back_button.onclick = () => {
-            path = back_stack.pop()
-            if (path == null) path = ""
-            display_filetree_path(filetree_obj_global, highlighting_obj_global, path)
-        }
-    }
-}
-
-function email_entry_setup() {
-    let email_entry = document.getElementById("email-entry")
-    let email_submit = document.getElementById("email-submit")
-    if (email_entry && email_submit) {
-        const func = () => {
-            console.log(`Starting ${email_entry.value}`)
-            const start_time = performance.now()
-            display_filetree_with_params({}, {"emails": [email_entry.value]})
-            const end_time = performance.now()
-            console.log(end_time-start_time)
-            return false
-        }
-        email_submit.onclick = func
-        email_submit.onsubmit = func
-    }
-}
 
 function display_filetree_with_params(filetree_params, highlight_params) {
     highlighting_obj_global = JSON.parse(loadFile(`highlight/${DATABASE_NAME}.json`, highlight_params))
@@ -296,8 +269,6 @@ function display_filetree_with_params(filetree_params, highlight_params) {
 
 function main() {
     display_filetree_with_params({}, {})
-    back_button_setup()
-    email_entry_setup()
 }
 
 let filetree_obj_global = JSON.parse(loadFile(`filetree/${DATABASE_NAME}.json`))
