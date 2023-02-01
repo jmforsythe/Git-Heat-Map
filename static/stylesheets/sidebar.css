@@ -6,6 +6,9 @@
     flex-direction: column;
     flex-basis: 10%;
     align-items: center;
+    
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .sidebar_container {
@@ -40,4 +43,11 @@ input[type=text] {
     word-break: break-all;
     width: 100%;
     min-height: 1em;
+
+    display: inline-flex;
+}
+
+.list_item .close_button {
+    margin-left: auto;
+    flex-basis: 10%;
 }

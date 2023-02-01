@@ -12,7 +12,18 @@ function back_button_setup() {
 function make_list_item(text) {
     let el = document.createElement("div")
     el.classList.add("list_item")
-    el.innerText = text
+    let text_el = document.createElement("div", )
+    el.appendChild(text_el)
+    text_el.classList.add("list_item_text")
+    text_el.innerText = text
+    let close_button = document.createElement("button")
+    el.appendChild(close_button)
+    close_button.innerText = "x";
+    close_button.width = "1em";
+    close_button.classList.add("close_button")
+    close_button.onclick = () => {
+        el.parentElement.removeChild(el)
+    }
     return el
 }
 
@@ -36,7 +47,7 @@ function item_list_to_js_list(filter_id) {
     let filter_list = filter.querySelector(".item_list")
     let children = filter_list.querySelectorAll(".list_item")
     let out = []
-    children.forEach((c) => out.push(c.innerText))
+    children.forEach((c) => out.push(c.querySelector(".list_item_text").innerText))
     return out
 }
 
