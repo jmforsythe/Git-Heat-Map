@@ -9,7 +9,9 @@
 * Run web server with `python flask_app.py` (flask must be installed, can be install from pip)
 * Connect on `127.0.0.1:5000`
 * Available repos will be displayed, select the one you want to view
-* Select email to search for in the form at the bottom and click submit
+* Add emails you want to highlight by using the form on the right
+* Press submit query
+* Click on directories to zoom in, and the back button in the sidebar to zoom out
 
 ## Project Structure
 
