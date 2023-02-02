@@ -32,8 +32,11 @@
             </div>
             <div class="sidebar_container">
                 <div class="color_picker_container" id="sidebar_color_picker">
-                    <label for="color_picker">Select hue</label>
-                    <input type="number" class="color_picker" name="color_picker" value="0" min="0" max="255"/>
+                    <label for="color_control">Hue</label>
+                    <div class="color_control">
+                        <input type="range" class="color_picker_range" name="color_picker_range" value="0" min="0" max="360"/>
+                        <input type="number" class="color_picker_number" name="color_picker_number" value="0" min="0" max="360"/>
+                    </div>
                     <div class="color_display"></div>
                 </div>
                 <input type="button" value="Submit query" id="submit_query"/>

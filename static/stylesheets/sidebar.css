@@ -35,6 +35,10 @@ input[type=text] {
     box-sizing: border-box;
 }
 
+input[type=number] {
+    box-sizing: border-box;
+}
+
 .text_submit {
     margin-bottom: 0.5em;
 }
@@ -81,4 +85,14 @@ input[type=text] {
     height: 50%;
     aspect-ratio: 1;
     margin: 0;
+}
+
+.color_picker_number {
+    width: 4em;
+}
+
+.color_control {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
 }

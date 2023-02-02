@@ -234,7 +234,7 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
     const width = Math.sqrt(area*aspect_ratio)
     const height = area / width
 
-    MIN_AREA = area / 10000
+    MIN_AREA = area / 5000
 
     SVG_ROOT.setAttribute("viewBox", `0 0 ${width} ${height}`)
     if ("children" in filetree_obj) {
@@ -268,7 +268,7 @@ function display_filetree_with_params(filetree_params, highlight_params, hue) {
 }
 
 function main() {
-    display_filetree_with_params({}, {"commits_exclude": ["%"]}, 0)
+    display_filetree_with_params({}, {"commits_include": [null]}, 0)
 }
 
 let filetree_obj_global = JSON.parse(loadFile(`filetree/${DATABASE_NAME}.json`))
