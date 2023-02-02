@@ -71,3 +71,14 @@ input[type=text] {
     color: #909090;
 }
 
+.color_picker_container {
+    display: inline-flex;
+    border: black 1px solid;
+    align-items: center;
+}
+
+.color_picker_container .color_display {
+    height: 50%;
+    aspect-ratio: 1;
+    margin: 0;
+}

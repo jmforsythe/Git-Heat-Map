@@ -228,13 +228,13 @@ function get_child_from_path(obj, path) {
     }
 }
 
-function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, cur_path) {
+function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, cur_path, hue) {
     delete_children(SVG_ROOT)
     const area = filetree_obj.val
     const width = Math.sqrt(area*aspect_ratio)
     const height = area / width
 
-    MIN_AREA = area / 5000
+    MIN_AREA = area / 10000
 
     SVG_ROOT.setAttribute("viewBox", `0 0 ${width} ${height}`)
     if ("children" in filetree_obj) {
@@ -242,12 +242,12 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
     } else {
         handle_row([filetree_obj], x, y, width, height, cur_path, 0, SVG_ROOT)
     }
-    highlight_obj(highlighting_obj, 0, cur_path)
+    highlight_obj(highlighting_obj, hue, cur_path)
 }
 
-function display_filetree_path(filetree_obj, highlighting_obj, path) {
+function display_filetree_path(filetree_obj, highlighting_obj, path, hue) {
     const [SVG_ROOT, x, y, aspect_ratio] = get_drawing_params()
-    display_filetree(get_child_from_path(filetree_obj, path), get_child_from_path(highlighting_obj, path), SVG_ROOT, x, y, aspect_ratio, path)
+    display_filetree(get_child_from_path(filetree_obj, path), get_child_from_path(highlighting_obj, path), SVG_ROOT, x, y, aspect_ratio, path, hue)
 }
 
 function get_drawing_params() {
@@ -261,14 +261,14 @@ function get_drawing_params() {
 }
 
 
-function display_filetree_with_params(filetree_params, highlight_params) {
+function display_filetree_with_params(filetree_params, highlight_params, hue) {
     highlighting_obj_global = JSON.parse(loadFile(`highlight/${DATABASE_NAME}.json`, highlight_params))
     back_stack = []
-    display_filetree_path(filetree_obj_global, highlighting_obj_global, "")
+    display_filetree_path(filetree_obj_global, highlighting_obj_global, "", hue)
 }
 
 function main() {
-    display_filetree_with_params({}, {"commits_exclude": ["%"]})
+    display_filetree_with_params({}, {"commits_exclude": ["%"]}, 0)
 }
 
 let filetree_obj_global = JSON.parse(loadFile(`filetree/${DATABASE_NAME}.json`))

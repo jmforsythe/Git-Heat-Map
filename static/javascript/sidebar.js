@@ -41,7 +41,6 @@ function filter_entry_setup(filter_id) {
                 filter_list.appendChild(make_list_item(filter_entry.value))
             }
         }
-        email_submit.onclick = func
     }
 }
 
@@ -78,11 +77,26 @@ function submit_query_setup() {
     }
 }
 
+function color_picker_setup() {
+    let el = document.getElementById("sidebar_color_picker")
+    let input = el.querySelector(".color_picker")
+    let display = el.querySelector(".color_display")
+    display.style["background-color"] = `hsl(${input.value},100%,50%)`
+    input.addEventListener("input", (val) => display.style["background-color"] = `hsl(${val.target.value},100%,50%)`)
+}
+
+function get_hue() {
+    let el = document.getElementById("sidebar_color_picker")
+    let input = el.querySelector(".color_picker")
+    return input.value
+}
+
 function main() {
     back_button_setup()
     filter_entry_setup("email_filter")
     filter_entry_setup("commit_filter")
     submit_query_setup()
+    color_picker_setup()
 }
 
 main()
