@@ -9,7 +9,8 @@
 * Run web server with `python flask_app.py` (flask must be installed, can be install from pip)
 * Connect on `127.0.0.1:5000`
 * Available repos will be displayed, select the one you want to view
-* Add emails you want to highlight by using the form on the right
+* Add emails, commits, and date ranges you want to highlight by using the form on the right
+* Clicking on any of these entries will cause the query to exclude results matching that entry
 * Press submit query
 * Click on directories to zoom in, and the back button in the sidebar to zoom out
 
@@ -86,9 +87,6 @@ Currently no async functions are used. I believe the performance of the webpage 
 
 ### Remembering filters
 Filters must be re-entered every time the page is loaded. Ideally filters would be remembered either through cookies or by storing the filters as a url query, which would allow users to bookmark queries.
-
-### Filter builder sidebar
-Current interface is very barebones. Want to have a sidebar that will allow users to select authors, date ranges, etc, to control the highlighting.
 
 ### Selectable colours per author
 Currently red is hardcoded for all results. In order to show multiple authors we want to highlight in different colours, will need to decide how to colour files edited by both authors.

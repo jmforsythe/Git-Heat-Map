@@ -11,9 +11,8 @@ def get_filtered_query(filter):
     """
     params = []
     joins = set()
-    wheres = set("1")
+    wheres = set()
     wheres.add("files.filePath NOTNULL")
-
     if "emails_include" in filter:
         joins.add("JOIN commitAuthor on commitFile.hash = commitAuthor.hash")
         wheres.add("(" + " OR ".join(["0"] + [f"commitAuthor.authorEmail LIKE ?" for email in filter["emails_include"]]) + ")")
@@ -31,6 +30,18 @@ def get_filtered_query(filter):
     if "commits_exclude" in filter:
         wheres.add("(" + " OR ".join(["0"] + [f"commitFile.hash NOT LIKE ?" for hash in filter["commits_exclude"]]) + ")")
         params.extend(filter["commits_exclude"])
+
+    if "datetime_include" in filter:
+        joins.add("JOIN commits on commitFile.hash = commits.hash")
+        wheres.add("(" + " OR ".join(["0"] + [f"commits.authorDate BETWEEN ? AND ?" for date_range in filter["datetime_include"]]) + ")")
+        date_expand = [d for r in filter["datetime_include"] for d in r.split(" ")]
+        params.extend(date_expand)
+
+    if "datetime_exclude" in filter:
+        joins.add("JOIN commits on commitFile.hash = commits.hash")
+        wheres.add("(" + " OR ".join(["0"] + [f"commits.authorDate NOT BETWEEN ? AND ?" for date_range in filter["datetime_include"]]) + ")")
+        date_expand = [d for r in filter["datetime_exclude"] for d in r.split(" ")]
+        params.extend(date_expand)
 
     query = base_query.replace("JOIN_LINE", " ".join(joins)).replace("WHERE_LINE", " AND ".join(wheres))
     return query, tuple(params)

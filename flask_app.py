@@ -22,7 +22,7 @@ def filetree_json(name):
 
 @app.route("/highlight/<name>.json")
 def highight_json(name):
-    valid_keys = ("emails_include", "emails_exclude", "commits_include", "commits_exclude")
+    valid_keys = ("emails_include", "emails_exclude", "commits_include", "commits_exclude", "datetime_include", "datetime_exclude")
     params = {key: tuple(request.args.getlist(key)) for key in valid_keys if key in request.args.keys()}
     params_frozen = frozenset(params.items())
 

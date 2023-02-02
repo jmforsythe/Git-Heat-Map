@@ -53,7 +53,8 @@ input[type=number] {
 .list_item {
     border: 2px solid black;
     box-sizing: border-box;
-    word-break: break-all;
+    word-break: normal;
+    overflow-wrap: anywhere;
     width: 90%;
     min-height: 1em;
     margin: 1px;
@@ -95,4 +96,8 @@ input[type=number] {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
+}
+
+.datetime_entry {
+    box-sizing: border-box;
 }
