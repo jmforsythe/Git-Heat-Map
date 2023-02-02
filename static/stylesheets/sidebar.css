@@ -16,6 +16,7 @@
     flex-direction: column;
     align-items: center;
     margin-top: 10%;
+    padding-bottom: 5%;
     width: 100%;
     border: 2px solid black;
     box-sizing: border-box;
@@ -34,20 +35,39 @@ input[type=text] {
     box-sizing: border-box;
 }
 
+.text_submit {
+    margin-bottom: 0.5em;
+}
+
 .item_list {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .list_item {
     border: 2px solid black;
+    box-sizing: border-box;
     word-break: break-all;
-    width: 100%;
+    width: 90%;
     min-height: 1em;
+    margin: 1px;
 
     display: inline-flex;
+}
+
+.list_item:hover {
+    border-color: darkgray;
 }
 
 .list_item .close_button {
     margin-left: auto;
     flex-basis: 10%;
 }
+
+.item_negated .list_item_text {
+    text-decoration-line: line-through;
+    color: #909090;
+}
+

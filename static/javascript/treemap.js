@@ -268,7 +268,7 @@ function display_filetree_with_params(filetree_params, highlight_params) {
 }
 
 function main() {
-    display_filetree_with_params({}, {})
+    display_filetree_with_params({}, {"commits_exclude": ["%"]})
 }
 
 let filetree_obj_global = JSON.parse(loadFile(`filetree/${DATABASE_NAME}.json`))

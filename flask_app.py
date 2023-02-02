@@ -22,9 +22,8 @@ def filetree_json(name):
 
 @app.route("/highlight/<name>.json")
 def highight_json(name):
-    params = {}
-    emails = request.args.getlist("emails")
-    params["emails"] = tuple(emails)
+    valid_keys = ("emails_include", "emails_exclude", "commits_include", "commits_exclude")
+    params = {key: tuple(request.args.getlist(key)) for key in valid_keys if key in request.args.keys()}
     params_frozen = frozenset(params.items())
 
     return get_highlight_json(name, params_frozen)

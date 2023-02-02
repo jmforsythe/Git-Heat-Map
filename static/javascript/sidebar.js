@@ -24,45 +24,64 @@ function make_list_item(text) {
     close_button.onclick = () => {
         el.parentElement.removeChild(el)
     }
+    el.onclick = () => {
+        el.classList.toggle("item_negated")
+    }
     return el
 }
 
-function email_entry_setup() {
-    let email_filter = document.getElementById("email_filter")
-    let email_entry = email_filter.querySelector(".text_entry")
-    let email_submit = email_filter.querySelector(".text_submit")
-    let email_list = email_filter.querySelector(".item_list")
-    if (email_entry && email_submit) {
-        const func = () => {
-            if (email_entry.value != "") { 
-                email_list.appendChild(make_list_item(email_entry.value))
+function filter_entry_setup(filter_id) {
+    let filter = document.getElementById(filter_id)
+    let filter_entry = filter.querySelector(".text_entry")
+    let filter_submit = filter.querySelector(".text_submit")
+    let filter_list = filter.querySelector(".item_list")
+    if (filter_entry && filter_submit) {
+        filter_submit.onclick = () => {
+            if (filter_entry.value != "") { 
+                filter_list.appendChild(make_list_item(filter_entry.value))
             }
         }
         email_submit.onclick = func
     }
 }
 
-function item_list_to_js_list(filter_id) {
+function get_include_exclude(filter_name, filter_id) {
     let filter = document.getElementById(filter_id)
     let filter_list = filter.querySelector(".item_list")
     let children = filter_list.querySelectorAll(".list_item")
-    let out = []
-    children.forEach((c) => out.push(c.querySelector(".list_item_text").innerText))
+    let include = []
+    let exclude = []
+    children.forEach((c) => {
+        if (c.classList.contains("item_negated")) {
+            exclude.push(c.querySelector(".list_item_text").innerText)
+        } else {
+            include.push(c.querySelector(".list_item_text").innerText)
+        }
+    })
+    const include_name = filter_name+"_include"
+    const exclude_name = filter_name+"_exclude"
+    out = {}
+    out[include_name] = include
+    out[exclude_name] = exclude
     return out
 }
 
 function submit_query_setup() {
+    const query_list = [["emails", "email_filter"], ["commits", "commit_filter"]]
     let submit_button = document.getElementById("submit_query")
     if (submit_button) {
         submit_button.onclick = () => {
-            display_filetree_with_params({}, {"emails": item_list_to_js_list("email_filter")})
+            let query = {}
+            query_list.forEach((q) => query = {...query, ...get_include_exclude(...q)})
+            display_filetree_with_params({}, query, get_hue())
         }
     }
 }
 
 function main() {
     back_button_setup()
-    email_entry_setup()
+    filter_entry_setup("email_filter")
+    filter_entry_setup("commit_filter")
     submit_query_setup()
 }
 

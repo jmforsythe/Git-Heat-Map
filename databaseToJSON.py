@@ -1,11 +1,7 @@
 import fileTree
 import sqlite3
 
-example_filter = {
-    "emails": []
-}
-
-def get_filtered_query(filter=example_filter):
+def get_filtered_query(filter):
     base_query = """
         SELECT files.filePath, SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved)
         FROM files
@@ -15,13 +11,26 @@ def get_filtered_query(filter=example_filter):
     """
     params = []
     joins = set()
-    wheres = set()
+    wheres = set("1")
     wheres.add("files.filePath NOTNULL")
 
-    if "emails" in filter:
+    if "emails_include" in filter:
         joins.add("JOIN commitAuthor on commitFile.hash = commitAuthor.hash")
-        wheres.add("(" + " OR ".join(["0"] + [f"commitAuthor.authorEmail LIKE ?" for email in filter["emails"]]) + ")")
-        params.extend(filter["emails"])
+        wheres.add("(" + " OR ".join(["0"] + [f"commitAuthor.authorEmail LIKE ?" for email in filter["emails_include"]]) + ")")
+        params.extend(filter["emails_include"])
+    
+    if "emails_exclude" in filter:
+        joins.add("JOIN commitAuthor on commitFile.hash = commitAuthor.hash")
+        wheres.add("(" + " OR ".join(["0"] + [f"commitAuthor.authorEmail NOT LIKE ?" for email in filter["emails_exclude"]]) + ")")
+        params.extend(filter["emails_exclude"])
+
+    if "commits_include" in filter:
+        wheres.add("(" + " OR ".join(["0"] + [f"commitFile.hash LIKE ?" for hash in filter["commits_include"]]) + ")")
+        params.extend(filter["commits_include"])
+
+    if "commits_exclude" in filter:
+        wheres.add("(" + " OR ".join(["0"] + [f"commitFile.hash NOT LIKE ?" for hash in filter["commits_exclude"]]) + ")")
+        params.extend(filter["commits_exclude"])
 
     query = base_query.replace("JOIN_LINE", " ".join(joins)).replace("WHERE_LINE", " AND ".join(wheres))
     return query, tuple(params)
