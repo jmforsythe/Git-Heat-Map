@@ -81,7 +81,7 @@ function get_include_exclude(filter_name, filter_id) {
 }
 
 function submit_query_setup() {
-    const query_list = [["emails", "email_filter"], ["commits", "commit_filter"], ["datetime", "datetime_filter"]]
+    const query_list = [["email", "email_filter"], ["commit", "commit_filter"], ["filename", "filename_filter"], ["datetime", "datetime_filter"]]
     let submit_button = document.getElementById("submit_query")
     if (submit_button) {
         submit_button.onclick = () => {
@@ -118,6 +118,7 @@ function main() {
     back_button_setup()
     filter_entry_setup("email_filter")
     filter_entry_setup("commit_filter")
+    filter_entry_setup("filename_filter")
     date_entry_setup("datetime_filter")
     submit_query_setup()
     color_picker_setup()

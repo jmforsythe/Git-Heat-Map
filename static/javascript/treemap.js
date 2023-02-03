@@ -268,7 +268,7 @@ function display_filetree_with_params(filetree_params, highlight_params, hue) {
 }
 
 function main() {
-    display_filetree_with_params({}, {"commits_include": [null]}, 0)
+    display_filetree_with_params({}, {"commit_include": [null]}, 0)
 }
 
 let filetree_obj_global = JSON.parse(loadFile(`filetree/${DATABASE_NAME}.json`))

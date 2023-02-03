@@ -9,10 +9,13 @@
 * Run web server with `python flask_app.py` (flask must be installed, can be install from pip)
 * Connect on `127.0.0.1:5000`
 * Available repos will be displayed, select the one you want to view
-* Add emails, commits, and date ranges you want to highlight by using the form on the right
+* Add emails, commits, filenames, and date ranges you want to highlight by using the form on the right, with `%` acting as a wildcard
 * Clicking on any of these entries will cause the query to exclude results matching that entry
+* Choose the hue that you want the chart to use for highlighting
 * Press submit query
 * Click on directories to zoom in, and the back button in the sidebar to zoom out
+
+Note that for performance reasons, very small boxes are not drawn. This is set by the `MIN_AREA` global variable in the `display_filetree` function in [treemap.js](static/javascript/treemap.js).
 
 ## Project Structure
 

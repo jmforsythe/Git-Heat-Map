@@ -13,23 +13,31 @@ def get_filtered_query(filter):
     joins = set()
     wheres = set()
     wheres.add("files.filePath NOTNULL")
-    if "emails_include" in filter:
+    if "email_include" in filter:
         joins.add("JOIN commitAuthor on commitFile.hash = commitAuthor.hash")
-        wheres.add("(" + " OR ".join(["0"] + [f"commitAuthor.authorEmail LIKE ?" for email in filter["emails_include"]]) + ")")
-        params.extend(filter["emails_include"])
+        wheres.add("(" + " OR ".join(["0"] + [f"commitAuthor.authorEmail LIKE ?" for email in filter["email_include"]]) + ")")
+        params.extend(filter["email_include"])
     
-    if "emails_exclude" in filter:
+    if "email_exclude" in filter:
         joins.add("JOIN commitAuthor on commitFile.hash = commitAuthor.hash")
-        wheres.add("(" + " OR ".join(["0"] + [f"commitAuthor.authorEmail NOT LIKE ?" for email in filter["emails_exclude"]]) + ")")
-        params.extend(filter["emails_exclude"])
+        wheres.add("(" + " OR ".join(["0"] + [f"commitAuthor.authorEmail NOT LIKE ?" for email in filter["email_exclude"]]) + ")")
+        params.extend(filter["email_exclude"])
 
-    if "commits_include" in filter:
-        wheres.add("(" + " OR ".join(["0"] + [f"commitFile.hash LIKE ?" for hash in filter["commits_include"]]) + ")")
-        params.extend(filter["commits_include"])
+    if "commit_include" in filter:
+        wheres.add("(" + " OR ".join(["0"] + [f"commitFile.hash LIKE ?" for hash in filter["commit_include"]]) + ")")
+        params.extend(filter["commit_include"])
 
-    if "commits_exclude" in filter:
-        wheres.add("(" + " OR ".join(["0"] + [f"commitFile.hash NOT LIKE ?" for hash in filter["commits_exclude"]]) + ")")
-        params.extend(filter["commits_exclude"])
+    if "commit_exclude" in filter:
+        wheres.add("(" + " OR ".join(["0"] + [f"commitFile.hash NOT LIKE ?" for hash in filter["commit_exclude"]]) + ")")
+        params.extend(filter["commit_exclude"])
+
+    if "filename_include" in filter:
+        wheres.add("(" + " OR ".join(["0"] + [f"files.filePath LIKE ?" for filename in filter["filename_include"]]) + ")")
+        params.extend(filter["filename_include"])
+
+    if "filename_exclude" in filter:
+        wheres.add("(" + " OR ".join(["0"] + [f"files.filePath NOT LIKE ?" for filename in filter["filename_exclude"]]) + ")")
+        params.extend(filter["filename_exclude"])
 
     if "datetime_include" in filter:
         joins.add("JOIN commits on commitFile.hash = commits.hash")
