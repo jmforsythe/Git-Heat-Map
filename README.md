@@ -1,12 +1,12 @@
 # Git-Heat-Map
 
-![Map showing the cpython repositiory, highlighting the files that Guido van Rossum changed the most](example_image.png)
-*Map showing the cpython repositiory, highlighting the files that Guido van Rossum changed the most*
+![Map showing the cpython repository, highlighting the files that Guido van Rossum changed the most](example_image.png)
+*Map showing the cpython repository, highlighting the files that Guido van Rossum changed the most*
 
 ## Basic use guide
 
 * Generate database with `python generate_db.py {path_to_repo_dir}`
-* Run web server with `python flask_app.py` (flask must be installed, can be install from pip)
+* Run web server with `python flask_app.py` (flask must be installed, can be installed from pip)
 * Connect on `127.0.0.1:5000`
 * Available repos will be displayed, select the one you want to view
 * Add emails, commits, filenames, and date ranges you want to highlight by using the form on the right, with `%` acting as a wildcard
@@ -86,7 +86,7 @@ Currently the only submodule changes that can be seen are the top level commit p
 Currently done using git log which can take a very long time for large repos. Will look into any other ways of getting needed information on files.
 
 ### Asynchronous javascript
-Currently no async functions are used. I believe the performance of the webpage could be imporved if things such as file loading and svg drawing was done asynchronously.
+Currently no async functions are used. I believe the performance of the webpage could be improved if things such as file loading and svg drawing was done asynchronously.
 
 ### Remembering filters
 Filters must be re-entered every time the page is loaded. Ideally filters would be remembered either through cookies or by storing the filters as a url query, which would allow users to bookmark queries.
