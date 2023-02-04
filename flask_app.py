@@ -3,6 +3,7 @@ import functools
 
 from flask import Flask, render_template, request
 import databaseToJSON
+from databaseGetAuthors import get_authors_from_db
 
 app = Flask(__name__)
 app.static_folder = "static"
@@ -14,7 +15,7 @@ def index_page():
 
 @app.route("/<name>")
 def treemap_page(name):
-    return render_template("treemap.html", name=name)
+    return render_template("treemap.html", name=name, emails=get_authors_from_db(name))
 
 @app.route("/filetree/<name>.json")
 def filetree_json(name):

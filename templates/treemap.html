@@ -20,7 +20,11 @@
         <div id="sidebar">
             <div class="sidebar_container" id="email_filter">
                 Email filter
-                <input type="text" name="email" class="text_entry"/>
+                <select name="email" class="text_entry">
+                    {% for authorEmail, authorName in emails %}
+                    <option value="{{ authorEmail }}">{{ authorName }} &lt;{{ authorEmail}}&gt;</option>
+                    {% endfor %}
+                </select>
                 <input type="button" value="Add email" class="text_submit"/>
                 <div class="item_list"></div>
             </div>
