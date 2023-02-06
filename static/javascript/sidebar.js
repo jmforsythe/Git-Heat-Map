@@ -4,7 +4,7 @@ function back_button_setup() {
         back_button.onclick = () => {
             path = back_stack.pop()
             if (path == null) path = ""
-            display_filetree_path(filetree_obj_global, highlighting_obj_global, path)
+            display_filetree_path(filetree_obj_global, highlighting_obj_global, path, get_hue())
         }
     }
 }

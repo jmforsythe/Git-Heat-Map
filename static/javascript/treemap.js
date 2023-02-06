@@ -102,7 +102,7 @@ function get_box_text_element(obj) {
     if (obj.level == 0) {
         if (!obj.leaf) element.onclick = () => {
             back_stack.push(obj.parent)
-            display_filetree_path(filetree_obj_global, highlighting_obj_global, path)
+            display_filetree_path(filetree_obj_global, highlighting_obj_global, path, get_hue())
         }
         element.onmouseover = () => box.classList.add("svg_box_selected")
         element.onmouseout = () => box.classList.remove("svg_box_selected")
