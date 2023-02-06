@@ -52,7 +52,6 @@ function date_entry_setup(filter_id) {
     if (filter_entry_start && filter_entry_end && filter_submit) {
         filter_submit.onclick = () => {
             if (filter_entry_start.value != "" && filter_entry_end.value != "") {
-                console.log(3) 
                 filter_list.appendChild(make_list_item(filter_entry_start.value + " " + filter_entry_end.value))
             }
         }
