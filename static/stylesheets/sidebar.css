@@ -101,3 +101,10 @@ input[type=number] {
 .datetime_entry {
     box-sizing: border-box;
 }
+
+#save_button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}

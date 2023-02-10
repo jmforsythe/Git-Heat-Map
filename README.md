@@ -1,7 +1,7 @@
 # Git-Heat-Map
 
-![Map showing the cpython repositiory, highlighting the files that Guido van Rossum changed the most](example_image.png)
-*Map showing the cpython repositiory, highlighting the files that Guido van Rossum changed the most*
+![Map showing the files in cpython that Guido van Rossum changed the most](example_image.svg)
+*Map showing the files in cpython that Guido van Rossum changed the most*
 
 ## Basic use guide
 

@@ -230,6 +230,7 @@ function get_child_from_path(obj, path) {
 
 function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, cur_path, hue) {
     delete_children(SVG_ROOT)
+    add_styles(SVG_ROOT)
     const area = filetree_obj.val
     const width = Math.sqrt(area*aspect_ratio)
     const height = area / width
