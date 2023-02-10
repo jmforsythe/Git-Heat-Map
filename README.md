@@ -1,7 +1,8 @@
 # Git-Heat-Map
 
-![Map showing the files in cpython that Guido van Rossum changed the most](example_image.svg)
-*Map showing the files in cpython that Guido van Rossum changed the most*
+![Map showing the files in cpython that Guido van Rossum changed the most](example_image.png)
+*Map showing the files in cpython that Guido van Rossum changed the most;
+full SVG image available in repo*
 
 ## Basic use guide
 
