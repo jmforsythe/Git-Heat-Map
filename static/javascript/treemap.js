@@ -34,7 +34,7 @@ function worst(R, w) {
 }
 
 NEST = true
-MIN_AREA = 0
+MIN_AREA = -Infinity
 function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
     if (width == 0 || height == 0) return
     let row_area = row.reduce((acc, cur) => acc+cur.val, 0)
@@ -234,7 +234,7 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
     const width = Math.sqrt(area*aspect_ratio)
     const height = area / width
 
-    MIN_AREA = area / 5000
+    if (MIN_AREA === -Infinity) MIN_AREA = area / 5000
 
     SVG_ROOT.setAttribute("viewBox", `0 0 ${width} ${height}`)
     if ("children" in filetree_obj) {

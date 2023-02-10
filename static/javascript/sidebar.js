@@ -113,6 +113,14 @@ function get_hue() {
     return input_number.value
 }
 
+function size_picker_setup() {
+    let el = document.getElementById("size_picker_number")
+    if (MIN_AREA != -Infinity) el.value = MIN_AREA
+    el.addEventListener("input", (event) => {
+        MIN_AREA = el.value
+    })
+}
+
 function main() {
     back_button_setup()
     filter_entry_setup("email_filter")
@@ -121,6 +129,7 @@ function main() {
     date_entry_setup("datetime_filter")
     submit_query_setup()
     color_picker_setup()
+    size_picker_setup()
 }
 
 main()
