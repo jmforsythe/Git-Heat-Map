@@ -11,11 +11,10 @@
 * Available repos will be displayed, select the one you want to view
 * Add emails, commits, filenames, and date ranges you want to highlight by using the form on the right, with `%` acting as a wildcard
 * Clicking on any of these entries will cause the query to exclude results matching that entry
+* Choose the minimum size of box to draw, with smaller numbers resulting in greater detail at the cost of performance
 * Choose the hue that you want the chart to use for highlighting
 * Press submit query
 * Click on directories to zoom in, and the back button in the sidebar to zoom out
-
-Note that for performance reasons, very small boxes are not drawn. This is set by the `MIN_AREA` global variable in the `display_filetree` function in [treemap.js](static/javascript/treemap.js).
 
 ## Project Structure
 
@@ -68,14 +67,12 @@ Database size also scales linearly, with approximately 2600 commits/MB, or requi
 
 For this test I filtered each repo by its most prominent authors:
 
-| Repo | Author filter | Time taken |
-| --- | --- | --- |
-| linux | torvalds@linux-foundation.org | 45.4 seconds |
-| cpython | guido@python.org | 1.9 seconds |
+| Repo | Author filter | Drawing treemap time | Highlighting treemap time |
+| --- | --- | --- | --- |
+| linux | torvalds@linux-foundation.org | 19.7 s | 54.3 s |
+| cpython | guido@python.org | 842 ms | 1238 ms |
 
-Currently `treemap.js` uses a global variable `MIN_AREA` to not render smallest files for better performance.
-
-While these performances are not as fast as desired, a more typically sized repo should perform fine.
+These times are with `minimum size drawn = 0`, on very large repositories, so the performance is not completely unreasonable. This does not include the time for the browser to actually render the svg, which can take longer.
 
 ## Wanted features
 
@@ -85,11 +82,8 @@ Currently the only submodule changes that can be seen are the top level commit p
 ### Faster database generation
 Currently done using git log which can take a very long time for large repos. Will look into any other ways of getting needed information on files.
 
-### Asynchronous javascript
-Currently no async functions are used. I believe the performance of the webpage could be imporved if things such as file loading and svg drawing was done asynchronously.
-
 ### Remembering filters
 Filters must be re-entered every time the page is loaded. Ideally filters would be remembered either through cookies or by storing the filters as a url query, which would allow users to bookmark queries.
 
-### Selectable colours per author
-Currently red is hardcoded for all results. In order to show multiple authors we want to highlight in different colours, will need to decide how to colour files edited by both authors.
+### Multiple filters per query
+Currently the user can submit only a single query for the highlighting. Ideally they could have a separate filter dictating which boxes to draw in the first place, and possibly multiple filters that could result in multiple colour highlighting on the same image.

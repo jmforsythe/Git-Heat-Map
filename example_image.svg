@@ -4,6 +4,12 @@
                         <stop offset="100%" style="stop-color: #bbbbbb; stop-opacity: 0.2"></stop>
                     </linearGradient>
                 </defs><style>
+.svg_background {
+    width: 100%;
+    height: 100%;
+    fill: #ffffff;
+}
+
 .svg_box {
     fill: "url(#Gradient2)";
     width: 100%;
@@ -109,7 +115,7 @@
     fill: #808080;
     stroke: white;
 }
-</style><svg x="0" y="0" width="166.04219493337294" height="144.58975328309523" class="svg_level_3 svg_leaf" id="svg_path_/Lib/test/decimaltestdata/fma.decTest"><rect class="svg_box" fill="url(#Gradient2)" fill-opacity="20%" style="fill: rgb(243, 247, 250); fill-opacity: 1;"></rect><text class="svg_text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="22.642117490914494" stroke-width="0.28302646863643116">fma.decTest</text><title>24008
+</style><rect class="svg_background"></rect><svg x="0" y="0" width="166.04219493337294" height="144.58975328309523" class="svg_level_3 svg_leaf" id="svg_path_/Lib/test/decimaltestdata/fma.decTest"><rect class="svg_box" fill="url(#Gradient2)" fill-opacity="20%" style="fill: rgb(243, 247, 250); fill-opacity: 1;"></rect><text class="svg_text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="22.642117490914494" stroke-width="0.28302646863643116">fma.decTest</text><title>24008
 /Lib/test/decimaltestdata/fma.decTest
 2</title></svg><svg x="166.04219493337294" y="0" width="143.92444504179818" height="144.58975328309523" class="svg_level_3 svg_leaf" id="svg_path_/Lib/test/decimaltestdata/powersqrt.decTest"><rect class="svg_box" fill="url(#Gradient2)" fill-opacity="20%" style="fill: rgb(243, 247, 250); fill-opacity: 1;"></rect><text class="svg_text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="12.699215738982192" stroke-width="0.1587401967372774">powersqrt.decTest</text><title>20810
 /Lib/test/decimaltestdata/powersqrt.decTest

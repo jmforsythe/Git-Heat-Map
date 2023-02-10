@@ -1,4 +1,10 @@
 const SVG_STYLE = `
+.svg_background {
+    width: 100%;
+    height: 100%;
+    fill: #ffffff;
+}
+
 .svg_box {
     fill: "url(#Gradient2)";
     width: 100%;

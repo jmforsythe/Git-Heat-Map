@@ -238,6 +238,9 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
     if (MIN_AREA === -Infinity) MIN_AREA = area / 5000
 
     SVG_ROOT.setAttribute("viewBox", `0 0 ${width} ${height}`)
+    const background_svg = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+    background_svg.classList.add("svg_background")
+    SVG_ROOT.appendChild(background_svg)
     if ("children" in filetree_obj) {
         squarify(x,y,width,height,filetree_obj.children, cur_path, 0, SVG_ROOT)
     } else {
