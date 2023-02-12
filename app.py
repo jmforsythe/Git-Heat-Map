@@ -1,7 +1,8 @@
 import glob
 import functools
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, abort
+
 import databaseToJSON
 
 app = Flask(__name__)
@@ -14,7 +15,10 @@ def index_page():
 
 @app.route("/<name>")
 def treemap_page(name):
-    return render_template("treemap.html", name=name)
+    if name in [db[:-3] for db in glob.glob("*.db")]:
+        return render_template("treemap.html", name=name)
+    else:
+        abort(404)
 
 @app.route("/filetree/<name>.json")
 def filetree_json(name):
@@ -34,4 +38,5 @@ def get_highlight_json(name, params):
     query, sql_params = databaseToJSON.get_filtered_query(params_dict)
     return databaseToJSON.get_json_from_db(f"{name}.db", query, sql_params)
 
-app.run()
+if __name__ == "__main__":
+    app.run()

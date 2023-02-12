@@ -7,7 +7,8 @@ full SVG image available in repo*
 ## Basic use guide
 
 * Generate database with `python generate_db.py {path_to_repo_dir}`
-* Run web server with `python flask_app.py` (flask must be installed, can be install from pip)
+* Install `flask` from pip
+* Run web server with `python app.py` or `flask run` (`flask run --host=<ip>` to run on that ip address, with `0.0.0.0` being used for all addresses on that machine)
 * Connect on `127.0.0.1:5000`
 * Available repos will be displayed, select the one you want to view
 * Add emails, commits, filenames, and date ranges you want to highlight by using the form on the right, with `%` acting as a wildcard
@@ -16,6 +17,7 @@ full SVG image available in repo*
 * Choose the hue that you want the chart to use for highlighting
 * Press submit query
 * Click on directories to zoom in, and the back button in the sidebar to zoom out
+* Update text rendering depth as desired
 
 ## Project Structure
 
