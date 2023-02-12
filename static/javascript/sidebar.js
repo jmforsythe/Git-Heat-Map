@@ -68,11 +68,19 @@ function get_include_exclude(filter_name, filter_id) {
     return out
 }
 
+function text_depth_setup() {
+    let el = document.getElementById("text_depth_number")
+    el.addEventListener("input", (event) => {
+        update_styles(document.getElementById("treemap_root_svg"), el.value)
+    })
+}
+
 function size_picker_setup() {
     let el = document.getElementById("size_picker_number")
-    if (MIN_AREA != -Infinity) el.value = MIN_AREA
+    el.value = MIN_AREA
     el.addEventListener("input", (event) => {
         MIN_AREA = el.value
+        MIN_AREA_USER_SET = true
     })
 }
 
@@ -140,6 +148,7 @@ function main() {
     filter_entry_setup("commit_filter")
     filter_entry_setup("filename_filter")
     date_entry_setup("datetime_filter")
+    text_depth_setup()
     size_picker_setup()
     color_picker_setup()
     submit_query_setup()

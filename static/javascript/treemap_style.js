@@ -21,99 +21,37 @@ const SVG_STYLE = `
 }
 
 .svg_text {
-    fill: none;
-    stroke: none;
+    visibility: hidden;
     font-family: Helvetica, "Trebuchet MS", Verdana, sans-serif;
-}
-
-.svg_level_0 .svg_text {
-    fill: #000000;
-    stroke: white;
-}
-
-.svg_level_1 .svg_text {
-    fill: #080808;
-    stroke: white;
-}
-
-.svg_level_2 .svg_text {
-    fill: #101010;
-    stroke: white;
-}
-
-.svg_level_3 .svg_text {
-    fill: #181818;
-    stroke: white;
-}
-
-.svg_level_4 .svg_text {
-    fill: #202020;
-    stroke: white;
-}
-
-.svg_level_5 .svg_text {
-    fill: #282828;
-    stroke: white;
-}
-
-.svg_level_6 .svg_text {
-    fill: #303030;
-    stroke: white;
-}
-
-.svg_level_7 .svg_text {
-    fill: #383838;
-    stroke: white;
-}
-
-.svg_level_8 .svg_text {
-    fill: #404040;
-    stroke: white;
-}
-
-.svg_level_9 .svg_text {
-    fill: #484848;
-    stroke: white;
-}
-
-.svg_level_10 .svg_text {
-    fill: #505050;
-    stroke: white;
-}
-
-.svg_level_11 .svg_text {
-    fill: #585858;
-    stroke: white;
-}
-
-.svg_level_12 .svg_text {
-    fill: #606060;
-    stroke: white;
-}
-
-.svg_level_13 .svg_text {
-    fill: #686868;
-    stroke: white;
-}
-
-.svg_level_14 .svg_text {
-    fill: #707070;
-    stroke: white;
-}
-
-.svg_level_15 .svg_text {
-    fill: #787878;
-    stroke: white;
-}
-
-.svg_level_16 .svg_text {
-    fill: #808080;
-    stroke: white;
 }
 `
 
-function add_styles(node) {
-    style = document.createElement("style")
-    style.innerHTML = SVG_STYLE
-    node.appendChild(style)
+function delete_styles(node) {
+    cur_style_element = node.querySelector("style")
+    if (cur_style_element) {
+        node.removeChild(cur_style_element)
+    }
+}
+
+function update_styles(node, text_depth) {
+    delete_styles(node)
+    const style = document.createElement("style")
+
+    let text_rule = ""
+
+    for (let i=0; i<text_depth; i++) {
+        const first_chr = Math.floor(i / 2)
+        const second_chr = i%2 ? 8 : 0
+        const hex = `${first_chr}${second_chr}`
+        text_rule +=
+`
+.svg_level_${i} .svg_text {
+    fill: #${hex}${hex}${hex};
+    stroke: white;
+    visibility: visible;
+}
+`
+    }
+    style.innerHTML = SVG_STYLE + text_rule
+    node.insertBefore(style, node.firstChild)
 }
