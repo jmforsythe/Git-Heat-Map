@@ -7,8 +7,13 @@ const SVG_STYLE = `
 
 .svg_box {
     fill: "url(#Gradient2)";
+    visibility: hidden;
     width: 100%;
     height: 100%;
+}
+
+.is_visible .svg_box {
+    visibility: visible;
 }
 
 .svg_box_selected {
@@ -45,7 +50,7 @@ function update_styles(node, text_depth) {
         const hex = `${first_chr}${second_chr}`
         text_rule +=
 `
-.svg_level_${i} .svg_text {
+.svg_level_${i}.is_visible .svg_text {
     fill: #${hex}${hex}${hex};
     stroke: white;
     visibility: visible;

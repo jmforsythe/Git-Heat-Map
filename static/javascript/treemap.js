@@ -112,7 +112,9 @@ function get_box_text_element(obj) {
     element.appendChild(text)
     element.appendChild(title)
 
-    if (obj.area < MIN_AREA) element.setAttribute("visibility", "hidden")
+    if (obj.area >= MIN_AREA) {
+        element.classList.add("is_visible")
+    }
 
     return element
 }
