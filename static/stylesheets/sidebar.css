@@ -76,10 +76,20 @@ input[type=number] {
     color: #909090;
 }
 
+.number_picker {
+    display: inline-flex;
+    border: black 1px solid;
+    align-items: center;
+    padding: 2%;
+    margin: 2%;
+}
+
 .color_picker_container {
     display: inline-flex;
     border: black 1px solid;
     align-items: center;
+    padding: 2%;
+    margin: 2%;
 }
 
 .color_picker_container .color_display {
@@ -89,7 +99,7 @@ input[type=number] {
 }
 
 .color_picker_number {
-    width: 4em;
+    max-width: 4em;
 }
 
 .color_control {
