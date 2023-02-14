@@ -233,7 +233,7 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
     const height = area / width
 
     if (!MIN_AREA_USER_SET) {
-        MIN_AREA = area / 5000
+        MIN_AREA = Math.floor(area / 5000)
         document.getElementById("size_picker_number").value = MIN_AREA
     }
 
@@ -264,7 +264,6 @@ function get_drawing_params() {
     return [SVG_ROOT, x, y, aspect_ratio]
 }
 
-
 async function display_filetree_with_params(filetree_params, highlight_params, hue) {
     highlighting_obj_global = await JSON.parse(loadFile(`highlight/${DATABASE_NAME}.json`, highlight_params))
     back_stack = []
@@ -272,7 +271,7 @@ async function display_filetree_with_params(filetree_params, highlight_params, h
 }
 
 function main() {
-    display_filetree_with_params({}, {"commit_include": [null]}, 0)
+    display_filetree_path(filetree_obj_global, {}, "", 0)
     update_styles(document.getElementById("treemap_root_svg"), 1)
 }
 

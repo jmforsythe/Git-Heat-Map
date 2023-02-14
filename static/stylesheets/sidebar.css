@@ -77,11 +77,29 @@ input[type=number] {
 }
 
 .number_picker {
-    display: inline-flex;
+    display: flex;
     border: black 1px solid;
     align-items: center;
+    justify-content: center;
+    align-self: stretch;
     padding: 2%;
     margin: 2%;
+}
+
+.number_picker label {
+    flex-grow: 1;
+}
+
+.number_picker input{
+    justify-self: flex-end;
+}
+
+#text_depth_number {
+    flex-basis: 3em;
+}
+
+#size_picker_number {
+    flex-basis: 6em;
 }
 
 .color_picker_container {
