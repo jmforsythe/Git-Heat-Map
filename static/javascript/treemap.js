@@ -271,13 +271,13 @@ async function display_filetree_with_params(filetree_params, highlight_params, h
 }
 
 function main() {
-    display_filetree_path(filetree_obj_global, {}, "", 0)
+    display_filetree_path(filetree_obj_global, highlighting_obj_global, "", 0)
     update_styles(document.getElementById("treemap_root_svg"), 1)
 }
 
 let filetree_obj_global = JSON.parse(loadFile(`filetree/${DATABASE_NAME}.json`))
 sort_by_val(filetree_obj_global)
-let highlighting_obj_global
+let highlighting_obj_global = {"name": "/", "val": 0, "children": []}
 let back_stack = []
 
 main()

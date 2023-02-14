@@ -33,23 +33,26 @@ def treemap_page(name):
 @valid_db_check
 def filetree_json(name):
     if not os.path.isfile(f"{name}.json"):
-        with open(f"{name}.json", "w") as f:
+        with open(f"{name}.json", "wb") as f:
             json = databaseToJSON.get_json_from_db(f"{name}.db")
-            f.write(json)
+            f.write(json.encode(errors="replace"))
             return json
     else:
-        with open(f"{name}.json", "r") as f:
-            return f.read()
+        with open(f"{name}.json", "rb") as f:
+            return f.read().decode(errors="replace")
 
 @app.route("/highlight/<name>.json")
 @valid_db_check
-@functools.lru_cache(maxsize=100)
 def highight_json(name):
     valid_keys = ("email_include", "email_exclude", "commit_include", "commit_exclude", "filename_include", "filename_exclude", "datetime_include", "datetime_exclude")
     params = {key: tuple(request.args.getlist(key)) for key in valid_keys if key in request.args.keys()}
     params_frozen = frozenset(params.items())
 
-    params_dict = {a[0]: a[1] for a in params_frozen}
+    return get_highlight_json(name, params_frozen)
+
+@functools.lru_cache(maxsize=100)
+def get_highlight_json(name, params):
+    params_dict = {a[0]: a[1] for a in params}
     query, sql_params = databaseToJSON.get_filtered_query(params_dict)
     return databaseToJSON.get_json_from_db(f"{name}.db", query, sql_params)
 
