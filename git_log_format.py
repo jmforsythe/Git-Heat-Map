@@ -32,7 +32,8 @@ def main():
     last_commit = None if argc < 3 else sys.argv[2]
     log_process = get_log_process(sys.argv[1], last_commit)
     while line := log_process.stdout.readline():
-        print(line)
+        #print(line)
+        continue
 
 if __name__ == "__main__":
     main()

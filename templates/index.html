@@ -5,14 +5,14 @@
         <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheets/index.css') }}">
     </head>
     <body>
-        <div id="content">
+        <main>
             <h1>Git Heat Map</h1>
-            <ul>
-                <h2>Repos</h2>
+            <h2>Repos</h2>
+            <div class="link_container">
                 {% for db in db_list %}
-                    <li><a href="{{ db }}">{{ db }}</a></li>
+                    <div class="link_box" onclick="window.location='{{ db }}';">{{ db }}</div>
                 {% endfor %}
-            </ul>
-        </div>
+            </div>
+        <main>
     </body>
 </html>

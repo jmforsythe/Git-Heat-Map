@@ -22,7 +22,7 @@ def valid_db_check(func):
 
 @app.route("/")
 def index_page():
-    return render_template("index.html", db_list=db_list())
+    return render_template("index.html", db_list=sorted(db_list()))
 
 @app.route("/<name>")
 @valid_db_check

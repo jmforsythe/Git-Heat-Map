@@ -1,5 +1,5 @@
-#content {
-    max-width: 500px;
+main {
+    max-width: 90%;
     margin: auto;
     text-align: center;
 }
@@ -9,8 +9,23 @@ h1 {
     align-self: center;
 }
 
-ul {
-    display: inline-block;
-    list-style: none inside none;
-    padding: 0;
+a {
+    display: block;
+}
+
+.link_container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.link_box {
+    width: 200px;
+    aspect-ratio: 1 / 1;
+    border: 1px solid black;
+    margin: 3%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
