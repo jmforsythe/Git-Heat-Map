@@ -10,7 +10,7 @@
             <h2>Repos</h2>
             <div class="link_container">
                 {% for db in db_list %}
-                    <div class="link_box" onclick="window.location='{{ db }}';">{{ db }}</div>
+                    <a class="link_box" href="{{ db }}"><div>{{ db }}</div></a>
                 {% endfor %}
             </div>
         <main>
