@@ -70,7 +70,7 @@ nullify_file_sql = """
 regex_numstat_z = re.compile(r"([\-\d]+)\t([\-\d]+)\t(?:\0([^\0]+)\0([^\0]+)|([^\0]+))\0")
 
 def db_connection(path):
-    database_path = f"{path.stem}.db"
+    database_path = pathlib.Path(f"{path.stem}.db")
     con = sqlite3.connect(database_path)
 
     return con, database_path

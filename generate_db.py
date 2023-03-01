@@ -26,8 +26,10 @@ def generate_db(log_output, path):
     con.close()
 
     if last_commit != None:
-        with open(f"{database_path[:-3]}_lastcommit.txt", "w") as lc:
+        with open(f"{path.stem}_lastcommit.txt", "w") as lc:
             lc.write(last_commit)
+
+    return database_path
 
 def main():
     argc = len(sys.argv)
@@ -48,7 +50,9 @@ def main():
 
     log_output = log_process.stdout
 
-    generate_db(log_output, path)
+    database_path = generate_db(log_output, path)
+
+    print(f"Database generated at \"{database_path.absolute()}\"")
 
 if __name__ == "__main__":
     main()
