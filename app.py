@@ -1,5 +1,5 @@
 import glob
-import os
+import pathlib
 import functools
 
 from flask import Flask, render_template, request, abort
@@ -32,7 +32,7 @@ def treemap_page(name):
 @app.route("/filetree/<name>.json")
 @valid_db_check
 def filetree_json(name):
-    if not os.path.isfile(f"{name}.json"):
+    if not pathlib.Path(f"{name}.json").is_file():
         with open(f"{name}.json", "wb") as f:
             json = databaseToJSON.get_json_from_db(f"{name}.db")
             f.write(json.encode(errors="replace"))

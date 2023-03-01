@@ -4,8 +4,8 @@ import pathlib
 import git_database
 import git_log_format
 
-def generate_db(log_output):
-    con, database_path = git_database.db_connection(sys.argv)
+def generate_db(log_output, path):
+    con, database_path = git_database.db_connection(path)
     cur = con.cursor()
 
     git_database.create_tables(cur)
@@ -35,18 +35,20 @@ def main():
         print("No repo supplied")
         return
 
-    repo_name = pathlib.Path(sys.argv[1]).parts[-1]
+    path = pathlib.Path(sys.argv[1])
+
+    repo_name = path.stem
     last_commit_file = pathlib.Path(f"{repo_name}_lastcommit.txt")
     if last_commit_file.is_file():
         last_commit = last_commit_file.open().read()
     else:
         last_commit = None
 
-    log_process = git_log_format.get_log_process(sys.argv[1], last_commit)
+    log_process = git_log_format.get_log_process(path, last_commit)
 
     log_output = log_process.stdout
 
-    generate_db(log_output)
+    generate_db(log_output, path)
 
 if __name__ == "__main__":
     main()

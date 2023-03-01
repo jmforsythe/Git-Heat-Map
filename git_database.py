@@ -1,4 +1,4 @@
-import sys
+import pathlib
 import sqlite3
 import re
 
@@ -69,25 +69,8 @@ nullify_file_sql = """
 
 regex_numstat_z = re.compile(r"([\-\d]+)\t([\-\d]+)\t(?:\0([^\0]+)\0([^\0]+)|([^\0]+))\0")
 
-def db_connection(argv):
-    database_path = "test"
-
-    argc = len(argv)
-    if argc > 1:
-        reponame = argv[1]
-        path_unix = reponame.split("/")
-        path_win = reponame.split("\\")
-        if len(path_unix) >= len(path_win):
-            path = path_unix
-        else:
-            path = path_unix
-        while path[-1] == "":
-            path = path[:-1]
-        database_path = path[-1]
-    if argc > 2:
-        database_path = argv[2]
-    database_path += ".db"
-
+def db_connection(path):
+    database_path = f"{path.stem}.db"
     con = sqlite3.connect(database_path)
 
     return con, database_path
