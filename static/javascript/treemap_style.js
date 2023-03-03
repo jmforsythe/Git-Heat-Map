@@ -27,7 +27,7 @@ const SVG_STYLE = `
 
 .svg_text {
     visibility: hidden;
-    font-family: Helvetica, "Trebuchet MS", Verdana, sans-serif;
+    font-family: monospace;
 }
 `
 
