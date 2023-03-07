@@ -49,15 +49,18 @@ function squarify(x, y, width, height, children_in, parent_path, level, SVG_ROOT
     width = Math.max(0,width)
     height = Math.max(0,height)
     let size = width >= height ? height : width
-    let row = [children[0]]
-    let i = 1;
-    for (i=1; i<children.length; i++) {
-        let cur_worst = worst(row.map((c) => c.val), size)
+    let row = []
+    let cur_worst = Infinity
+    for (let i=0; i<children.length; i++) {
         let possible_worst = worst((row.concat(children[i])).map((c) => c.val), size)
-        if (cur_worst >= possible_worst) row.push(children[i])
+        if (cur_worst >= possible_worst) {
+            row.push(children[i])
+            cur_worst = possible_worst
+        }
         else break
     }
-    if (width != 0 && height != 0) children_out.push(...handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT))
+    const i = row.length
+    children_out.push(...handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT))
 
     let area = row.reduce((acc, c) => acc+c.val, 0)
     let size_used = area / size
@@ -84,23 +87,19 @@ function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
     row.forEach((val, index, array) => {
         let box_area = val.val
         if (width >= height) {
-            const row_width = row_area / height
-            const box_height = box_area / row_width
-            if (row_width > 0 && box_height > 0) {
+            const row_width = height != 0 ? row_area / height : 0
+            const box_height = row_width != 0 ? box_area / row_width : 0
                 let el = {"text": val.name, "area": box_area, "x": x, "y": y, "width": row_width, "height": box_height, "parent": parent_path, "level": level}
                 if (NEST && "children" in val) el.children = squarify(x, y, row_width, box_height, val.children, `${parent_path}/${val.name}`, level+1, SVG_ROOT)
                 out.push(el)
                 y += box_height
-            }
         } else {
-            const row_height = row_area / width
-            const box_width = box_area / row_height
-            if (row_height > 0 && box_width > 0) {
+            const row_height = width != 0 ? row_area / width : 0
+            const box_width = row_height != 0 ? box_area / row_height : 0
                 let el = {"text": val.name, "area": box_area, "x": x, "y": y, "width": box_width, "height": row_height, "parent": parent_path, "level": level}
                 if (NEST && "children" in val) el.children = squarify(x, y, box_width, row_height, val.children, `${parent_path}/${val.name}`, level+1, SVG_ROOT)
                 out.push(el)
                 x += box_width
-            }
         }
     })
     return out
@@ -155,7 +154,7 @@ function get_box_text_element(obj) {
     element.appendChild(text)
     element.appendChild(title)
 
-    if (obj.area >= MIN_AREA) {
+    if (obj.area >= Math.max(0, MIN_AREA)) {
         element.classList.add("is_visible")
     }
 
@@ -249,7 +248,7 @@ function set_alt_text(obj_tree, highlighting_obj) {
 
 // Highlight based on what fraction of a files changes are covered by the given filter
 // If false will highlight based on total changes to that file in the given filter
-FRACTION_HIGHLIGHTING = true
+FRACTION_HIGHLIGHTING = false
 
 function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, cur_path, hue) {
     delete_children(SVG_ROOT)
