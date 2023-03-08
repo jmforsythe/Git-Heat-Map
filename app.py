@@ -9,8 +9,10 @@ import databaseToJSON
 app = Flask(__name__)
 app.static_folder = "static"
 
+repos_dir = pathlib.Path(__file__).parent / "repos"
+
 def db_list():
-    return [db[:-3] for db in glob.glob("*.db")]
+    return (d.stem for d in repos_dir.iterdir() if d.is_dir())
 
 def valid_db_check(func):
     def wrapper(name):
@@ -29,19 +31,21 @@ def index_page():
 def treemap_page(name):
     return render_template("treemap.html", name=name)
 
-@app.route("/filetree/<name>.json")
+@app.route("/<name>/filetree.json")
 @valid_db_check
 def filetree_json(name):
-    if not pathlib.Path(f"{name}.json").is_file():
-        with open(f"{name}.json", "wb") as f:
-            json = databaseToJSON.get_json_from_db(f"{name}.db")
+    db_path = (repos_dir / name / name).with_suffix(".db")
+    json_path = repos_dir / name / "filetree.json"
+    if not json_path.is_file():
+        with open(json_path, "wb") as f:
+            json = databaseToJSON.get_json_from_db(db_path)
             f.write(json.encode(errors="replace"))
             return json
     else:
-        with open(f"{name}.json", "rb") as f:
+        with open(json_path, "rb") as f:
             return f.read().decode(errors="replace")
 
-@app.route("/highlight/<name>.json")
+@app.route("/<name>/highlight.json")
 @valid_db_check
 def highight_json(name):
     valid_keys = ("email_include", "email_exclude", "commit_include", "commit_exclude", "filename_include", "filename_exclude", "datetime_include", "datetime_exclude")
@@ -52,9 +56,10 @@ def highight_json(name):
 
 @functools.lru_cache(maxsize=100)
 def get_highlight_json(name, params):
+    db_path = (repos_dir / name / name).with_suffix(".db")
     params_dict = {a[0]: a[1] for a in params}
     query, sql_params = databaseToJSON.get_filtered_query(params_dict)
-    return databaseToJSON.get_json_from_db(f"{name}.db", query, sql_params)
+    return databaseToJSON.get_json_from_db(db_path, query, sql_params)
 
 if __name__ == "__main__":
     app.run()

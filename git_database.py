@@ -69,11 +69,9 @@ nullify_file_sql = """
 
 regex_numstat_z = re.compile(r"([\-\d]+)\t([\-\d]+)\t(?:\0([^\0]+)\0([^\0]+)|([^\0]+))\0")
 
-def db_connection(path):
-    database_path = pathlib.Path(f"{path.stem}.db")
+def db_connection(database_path):
     con = sqlite3.connect(database_path)
-
-    return con, database_path
+    return con
 
 def create_tables(cur):
     cur.execute("""

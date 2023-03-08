@@ -4,8 +4,8 @@ import pathlib
 import git_database
 import git_log_format
 
-def generate_db(log_output, path):
-    con, database_path = git_database.db_connection(path)
+def generate_db(log_output, database_path):
+    con = git_database.db_connection(database_path)
     cur = con.cursor()
 
     git_database.create_tables(cur)
@@ -25,11 +25,7 @@ def generate_db(log_output, path):
     con.commit()
     con.close()
 
-    if last_commit != None:
-        with open(f"{path.stem}_lastcommit.txt", "w") as lc:
-            lc.write(last_commit)
-
-    return database_path
+    return last_commit
 
 def main():
     argc = len(sys.argv)
@@ -37,20 +33,35 @@ def main():
         print("No repo supplied")
         return
 
-    path = pathlib.Path(sys.argv[1])
+    repos_dir = pathlib.Path(__file__).parent / "repos"
+    print(repos_dir)
+    repos_dir.mkdir(exist_ok=True)
 
-    repo_name = path.stem
-    last_commit_file = pathlib.Path(f"{repo_name}_lastcommit.txt")
+    source_path = pathlib.Path(sys.argv[1])
+
+    repo_name = source_path.stem
+
+    dest_dir = repos_dir / repo_name
+    dest_dir.mkdir(exist_ok=True)
+    database_path = (dest_dir / repo_name).with_suffix(".db")
+
+    last_commit_file = dest_dir / "lastcommit.txt"
     if last_commit_file.is_file():
-        last_commit = last_commit_file.open().read()
+        with open(last_commit_file, "r") as f:
+            last_commit = f.read()
     else:
         last_commit = None
 
-    log_process = git_log_format.get_log_process(path, last_commit)
+    log_process = git_log_format.get_log_process(source_path, last_commit)
 
     log_output = log_process.stdout
 
-    database_path = generate_db(log_output, path)
+    last_commit = generate_db(log_output, database_path)
+
+    if last_commit != None:
+        with open(last_commit_file, "w") as f:
+            f.write(last_commit)
+
 
     print(f"Database generated at \"{database_path.absolute()}\"")
 

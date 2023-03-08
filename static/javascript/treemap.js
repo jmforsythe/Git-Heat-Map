@@ -248,7 +248,7 @@ function set_alt_text(obj_tree, highlighting_obj) {
 
 // Highlight based on what fraction of a files changes are covered by the given filter
 // If false will highlight based on total changes to that file in the given filter
-FRACTION_HIGHLIGHTING = false
+FRACTION_HIGHLIGHTING = true
 
 function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect_ratio, cur_path, hue) {
     delete_children(SVG_ROOT)
@@ -297,7 +297,7 @@ function get_drawing_params() {
 }
 
 async function display_filetree_with_params(filetree_params, highlight_params, hue) {
-    highlighting_obj_global = await JSON.parse(loadFile(`highlight/${DATABASE_NAME}.json`, highlight_params))
+    highlighting_obj_global = await JSON.parse(loadFile(`${DATABASE_NAME}/highlight.json`, highlight_params))
     back_stack = []
     display_filetree_path(filetree_obj_global, highlighting_obj_global, "", hue)
 }
@@ -307,7 +307,7 @@ function main() {
     update_styles(document.getElementById("treemap_root_svg"), 1)
 }
 
-let filetree_obj_global = JSON.parse(loadFile(`filetree/${DATABASE_NAME}.json`))
+let filetree_obj_global = JSON.parse(loadFile(`${DATABASE_NAME}/filetree.json`))
 sort_by_val(filetree_obj_global)
 let highlighting_obj_global = {"name": "/", "val": 0, "children": []}
 let back_stack = []
