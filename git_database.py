@@ -1,4 +1,3 @@
-import pathlib
 import sqlite3
 import re
 

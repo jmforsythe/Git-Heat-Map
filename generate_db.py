@@ -34,7 +34,6 @@ def main():
         return
 
     repos_dir = pathlib.Path(__file__).parent / "repos"
-    print(repos_dir)
     repos_dir.mkdir(exist_ok=True)
 
     source_path = pathlib.Path(sys.argv[1])
