@@ -230,7 +230,8 @@ function draw_tree(obj_tree, SVG_ROOT) {
 function get_objs_to_highlight(obj_tree, highlighting_obj) {
     let out = []
     if ("children" in highlighting_obj) highlighting_obj.children.forEach((child) => {
-        out.push(...get_objs_to_highlight(obj_tree.children.find((child2) => child2.text == child.name), child))
+        obj_tree_child = obj_tree.children.find((child2) => child2.text == child.name)
+        if (obj_tree_child) out.push(...get_objs_to_highlight(obj_tree_child, child))
     })
     else if (highlighting_obj.val > 0) {
         obj_tree.highlight_value = highlighting_obj.val
