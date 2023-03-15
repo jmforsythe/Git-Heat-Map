@@ -258,7 +258,8 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
     const height = area / width
 
     if (!MIN_AREA_USER_SET) {
-        MIN_AREA = Math.floor(area / 5000)
+        // Currently disabling automatic min area
+        // MIN_AREA = Math.floor(area / 5000)
         document.getElementById("size_picker_number").value = MIN_AREA
     }
 
