@@ -1,7 +1,17 @@
+body {
+    min-height: 100vh;
+    margin: 0;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #e7e7ee;
+}
+
 main {
     max-width: 90%;
-    margin: auto;
-    text-align: center;
+    flex: 1;
+    margin: 0;
 }
 
 h1 {
@@ -11,6 +21,11 @@ h1 {
 
 a {
     display: block;
+    color: inherit;
+}
+
+a:active {
+    color: red;
 }
 
 .link_container {
@@ -23,9 +38,21 @@ a {
     width: 200px;
     aspect-ratio: 1 / 1;
     border: 1px solid black;
+    background-color: #d7d7dd;
     margin: 3%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.footer {
+    width: 100%;
+    background-color: grey;
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding-top: 20px;
+    min-height: 50px;
 }

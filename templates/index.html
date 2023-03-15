@@ -5,14 +5,17 @@
         <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheets/index.css') }}">
     </head>
     <body>
+        <h1>Git Heat Map</h1>
         <main>
-            <h1>Git Heat Map</h1>
             <h2>Repos</h2>
             <div class="link_container">
                 {% for db in db_list %}
                     <a class="link_box" href="{{ db }}"><div>{{ db }}</div></a>
                 {% endfor %}
             </div>
-        <main>
+        </main>
+        <div class="footer">
+            <a href="https://github.com/jmforsythe/Git-Heat-Map">GitHub</a>
+        </div>
     </body>
 </html>
