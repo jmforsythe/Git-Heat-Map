@@ -147,8 +147,10 @@ def handle_commit(cur, commit_lines):
     author_create(cur, fields["authorEmail"], fields["authorName"])
     commitAuthor_create(cur, fields["hash"], fields["authorEmail"])
     for i in range(len(keys), len(first_line_sep)-2):
-        if x := re.match(r"(.*) <(.*)>", first_line_sep[i]):
-            name, email = x.groups()
+        # Some repos (such as the bitcoin and godot repos) don't do co author trailers
+        # in the usual way, so need to remove newlines (done in git_log_format) and
+        # match for all authors on one line
+        for name, email in re.findall(r"(.*?) <(.*?)> ?", first_line_sep[i]):
             author_create(cur, email, name)
             commitAuthor_create(cur, fields["hash"], email)
 

@@ -9,7 +9,7 @@ def get_log_process(path, last_commit=None):
         "-C",
         path,
         "log",
-        f"--pretty=format:\"%n{GIT_COMMIT_FLAG}%H{SEPARATOR}%aN{SEPARATOR}%aE{SEPARATOR}%aI{SEPARATOR}%cN{SEPARATOR}%cE{SEPARATOR}%cI{SEPARATOR}%(trailers:key=Co-authored-by,valueonly=true,separator={SEPARATOR}){SEPARATOR}{SEPARATOR}%e\"",
+        f"--pretty=format:\"%n{GIT_COMMIT_FLAG}%H{SEPARATOR}%aN{SEPARATOR}%aE{SEPARATOR}%aI{SEPARATOR}%cN{SEPARATOR}%cE{SEPARATOR}%cI{SEPARATOR}%(trailers:key=Co-authored-by,valueonly=true,separator={SEPARATOR},unfold=true){SEPARATOR}{SEPARATOR}%e\"",
         "--reverse",
         "--use-mailmap",
         "--numstat",
