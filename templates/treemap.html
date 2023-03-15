@@ -31,7 +31,7 @@
                 <div class="item_list"></div>
             </div>
             <div class="sidebar_container" id="filename_filter">
-                Filename filter
+                File path filter
                 <input type="text" name="filenames" class="text_entry"/>
                 <input type="button" value="Add filename" class="text_submit"/>
                 <div class="item_list"></div>
@@ -44,11 +44,15 @@
                 <div class="item_list"></div>
             </div>
             <div class="sidebar_container">
-                <div class="number_picker">
+                <div class="control_box">
+                    <label for="hightlight_control">Fractional highlighting</label>
+                    <input type="checkbox" name="hightlight_control" id="hightlight_control" checked="true"/>
+                </div>
+                <div class="control_box">
                     <label for="text_depth_number">Text levels</label>
                     <input type="number" name="text_depth_number" id="text_depth_number" value="1" min="0"/>
                 </div>
-                <div class="number_picker">
+                <div class="control_box">
                     <label for="size_picker_number">Min area</label>
                     <input type="number" name="size_picker_number" id="size_picker_number" value="0" min="0"/>
                 </div>
@@ -61,6 +65,7 @@
                     <div class="color_display"></div>
                 </div>
                 <input type="button" value="Submit query" id="submit_query"/>
+                <input type="button" value="Refresh" id="refresh_button"/>
                 <input type="button" value="Back" id="back_button"/>
                 <div id="save_button">
                     <input type="button" value="Export svg">

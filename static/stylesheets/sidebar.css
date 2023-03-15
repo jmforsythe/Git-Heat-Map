@@ -76,7 +76,7 @@ input[type=number] {
     color: #909090;
 }
 
-.number_picker {
+.control_box {
     display: flex;
     border: black 1px solid;
     align-items: center;
@@ -86,11 +86,11 @@ input[type=number] {
     margin: 2%;
 }
 
-.number_picker label {
+.control_box label {
     flex-grow: 1;
 }
 
-.number_picker input{
+.control_box input{
     justify-self: flex-end;
 }
 

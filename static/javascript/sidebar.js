@@ -118,6 +118,26 @@ function submit_query_setup() {
     }
 }
 
+function fraction_highlighting_setup() {
+    const fraction_highlighting_control = document.getElementById("hightlight_control")
+    if (fraction_highlighting_control) {
+        fraction_highlighting_control.onchange = () => {
+            FRACTION_HIGHLIGHTING = fraction_highlighting_control.checked
+        }
+    }
+}
+
+function refresh_button_setup() {
+    let refresh_button = document.getElementById("refresh_button")
+    if (refresh_button) {
+        refresh_button.onclick = () => {
+            path = back_stack.slice(-1)
+            if (path == null) path = ""
+            display_filetree_path(filetree_obj_global, highlighting_obj_global, path, get_hue())
+        }
+    }
+}
+
 function back_button_setup() {
     let back_button = document.getElementById("back_button")
     if (back_button) {
@@ -152,6 +172,8 @@ function main() {
     size_picker_setup()
     color_picker_setup()
     submit_query_setup()
+    fraction_highlighting_setup()
+    refresh_button_setup()
     back_button_setup()
     export_svg_setup()
 }

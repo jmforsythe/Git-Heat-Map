@@ -162,12 +162,11 @@ function get_box_text_element(obj) {
 }
 
 function fraction_to_saturation_and_lightness(fraction) {
-    let percentage = fraction*100
-    sat_x1 = 0.5
-    sat_x0 = 40
-    light_x1 = -0.5
-    light_x0 = 100
-    return [sat_x1*percentage+sat_x0, light_x1*percentage+light_x0]
+    const saturation_max = 90
+    const saturation_min = 40
+    const lightness_min = 50
+    const lightness_max = 100
+    return [(saturation_max-saturation_min)*fraction+saturation_min, (lightness_min-lightness_max)*fraction+lightness_max]
 }
 
 function delete_children(node) {
@@ -278,7 +277,7 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
         const get_frac = (obj) => obj.highlight_value / obj.area
         const highlight_func = FRACTION_HIGHLIGHTING ? get_frac : get_val
         const max_val = objs_to_highlight.reduce((prev, cur) => Math.max(prev, highlight_func(cur)), 0)
-        objs_to_highlight.forEach((obj) => obj.highlight(hue, highlight_func(obj)/max_val))
+        objs_to_highlight.forEach((obj) => obj.highlight(hue, FRACTION_HIGHLIGHTING ? highlight_func(obj)/max_val : Math.log(highlight_func(obj))/Math.log(max_val)))
         set_alt_text({"children": obj_tree, "set_title": () => {}}, highlighting_obj)
     }
 }
