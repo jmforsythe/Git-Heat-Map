@@ -143,7 +143,10 @@ def handle_commit(cur, commit_lines):
     first_line_sep = commit_lines[0][1:].decode(encoding, errors="replace").split(COMMIT_SPLIT_SYMBOL)
     fields = {keys[i] : first_line_sep[i]
               for i in range(len(keys))}
-    commit_create(cur, fields)
+    try:
+        commit_create(cur, fields)
+    except sqlite3.IntegrityError:
+        return fields["hash"]
     author_create(cur, fields["authorEmail"], fields["authorName"])
     commitAuthor_create(cur, fields["hash"], fields["authorEmail"])
     for i in range(len(keys), len(first_line_sep)-2):
