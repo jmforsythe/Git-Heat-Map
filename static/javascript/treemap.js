@@ -110,7 +110,6 @@ function get_box_text_element(obj) {
     const is_leaf = !("children" in obj)
 
     let element = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    let box_highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
     let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
     let text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
     let title = document.createElementNS('http://www.w3.org/2000/svg', 'title')
@@ -123,10 +122,6 @@ function get_box_text_element(obj) {
     if (is_leaf) element.classList.add("svg_leaf")
     const path = `${obj.parent}/${obj.text}`
     element.setAttribute("id", `svg_path_${path}`)
-
-    box_highlight.classList.add("svg_box_highlight")
-    box_highlight.setAttribute("fill", "none")
-    box_highlight.setAttribute("fill-opacity", "100%")
 
     box.classList.add("svg_box")
     box.setAttribute("fill", "url(#Gradient2)")
@@ -155,7 +150,6 @@ function get_box_text_element(obj) {
         element.onmouseout = () => box.classList.remove("svg_box_selected")
     }
 
-    element.appendChild(box_highlight)
     element.appendChild(box)
     element.appendChild(text)
     element.appendChild(title)
@@ -207,6 +201,13 @@ function draw_tree(obj_tree, SVG_ROOT) {
 
     // Separate function so that we can update element colour dynamically
     obj_tree.update_highlight = () => {
+        if (obj_tree.SVG_ELEMENT.querySelector(".svg_box_highlight") === null) {
+            const box_highlight = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+            box_highlight.classList.add("svg_box_highlight")
+            box_highlight.setAttribute("fill", "none")
+            box_highlight.setAttribute("fill-opacity", "100%")
+            obj_tree.SVG_ELEMENT.insertBefore(box_highlight, obj_tree.SVG_ELEMENT.querySelector(".svg_box"))
+        }
         const rect = obj_tree.SVG_ELEMENT.querySelector(".svg_box_highlight")
         if ("hue" in obj_tree && "fraction" in obj_tree && rect) {
             [saturation, lightness] = fraction_to_saturation_and_lightness(obj_tree.fraction)
