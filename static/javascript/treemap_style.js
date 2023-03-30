@@ -29,6 +29,11 @@ const SVG_STYLE = `
     visibility: hidden;
     font-family: monospace;
 }
+
+.svg_box_highlight {
+    width: 100%;
+    height: 100%;
+}
 `
 
 function delete_styles(node) {
