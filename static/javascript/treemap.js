@@ -283,8 +283,11 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
         const get_val = (obj) => obj.highlight_value
         const get_frac = (obj) => obj.highlight_value / obj.area
         const highlight_func = FRACTION_HIGHLIGHTING ? get_frac : get_val
-        const max_val = objs_to_highlight.reduce((prev, cur) => Math.max(prev, highlight_func(cur)), 0)
-        objs_to_highlight.forEach((obj) => obj.highlight(hue, FRACTION_HIGHLIGHTING ? highlight_func(obj)/max_val : Math.log(highlight_func(obj))/Math.log(max_val)))
+        const max_val = objs_to_highlight.reduce((prev, cur) => Math.max(prev, highlight_func(cur)), -Infinity)
+        const min_val = objs_to_highlight.reduce((prev, cur) => Math.min(prev, highlight_func(cur)), Infinity)
+        // We want to scale using a log curve where f(max_val) = 1 and f(min_val) = 0
+        // This works with log_{max_val+1-min_val}(x+1-min_val)
+        objs_to_highlight.forEach((obj) => obj.highlight(hue, Math.log(highlight_func(obj)+1-min_val)/Math.log(max_val+1-min_val)))
         set_alt_text({"children": obj_tree, "set_title": () => {}}, highlighting_obj)
     }
 }
