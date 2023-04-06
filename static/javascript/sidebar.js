@@ -170,12 +170,13 @@ function export_svg_setup() {
 }
 
 function save_query(query) {
-    localStorage.setItem("stored_query", JSON.stringify(query))
+    localStorage.setItem(document.title + "_stored_query", JSON.stringify(query))
 }
 
 function load_query() {
     const query_list = [["email", "email_filter"], ["commit", "commit_filter"], ["filename", "filename_filter"], ["datetime", "datetime_filter"]]
-    const query = JSON.parse(localStorage.getItem("stored_query"))
+    const query = JSON.parse(localStorage.getItem(document.title + "_stored_query"))
+    if (!query) return
     query_list.forEach((q) => {
         const name = q[0]
         const filter_id = q[1]
