@@ -106,13 +106,19 @@ function get_hue() {
     return input_number.value
 }
 
-function submit_query_setup() {
+function get_query_object() {
     const query_list = [["email", "email_filter"], ["commit", "commit_filter"], ["filename", "filename_filter"], ["datetime", "datetime_filter"]]
+    let query = {}
+    query_list.forEach((q) => query = {...query, ...get_include_exclude(...q)})
+    return query
+}
+
+function submit_query_setup() {
     let submit_button = document.getElementById("submit_query")
     if (submit_button) {
         submit_button.onclick = () => {
-            let query = {}
-            query_list.forEach((q) => query = {...query, ...get_include_exclude(...q)})
+            const query = get_query_object()
+            save_query(query)
             display_filetree_with_params({}, query, get_hue())
         }
     }
@@ -163,6 +169,35 @@ function export_svg_setup() {
     }
 }
 
+function save_query(query) {
+    localStorage.setItem("stored_query", JSON.stringify(query))
+}
+
+function load_query() {
+    const query_list = [["email", "email_filter"], ["commit", "commit_filter"], ["filename", "filename_filter"], ["datetime", "datetime_filter"]]
+    const query = JSON.parse(localStorage.getItem("stored_query"))
+    query_list.forEach((q) => {
+        const name = q[0]
+        const filter_id = q[1]
+        const filter = document.getElementById(filter_id)
+        const filter_list = filter.querySelector(".item_list")
+        if (name+"_include" in query) {
+            query[name+"_include"].forEach((val) => {
+                if (val && val != "") { 
+                    filter_list.appendChild(make_list_item(val))
+                }
+            })
+        }
+        if (name+"_exclude" in query) {
+            query[name+"_exclude"].forEach((val) => {
+                if (val && val != "") { 
+                    filter_list.appendChild(make_list_item(val)).classList.toggle("item_negated")
+                }
+            })
+        }
+    })
+}
+
 function main() {
     filter_entry_setup("email_filter")
     filter_entry_setup("commit_filter")
@@ -176,6 +211,7 @@ function main() {
     refresh_button_setup()
     back_button_setup()
     export_svg_setup()
+    load_query()
 }
 
 main()

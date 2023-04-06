@@ -89,8 +89,5 @@ Currently the only submodule changes that can be seen are the top level commit p
 ### Faster database generation
 Currently done using git log which can take a very long time for large repos. Will look into any other ways of getting needed information on files.
 
-### Remembering filters
-Filters must be re-entered every time the page is loaded. Ideally filters would be remembered either through cookies or by storing the filters as a url query, which would allow users to bookmark queries.
-
 ### Multiple filters per query
 Currently the user can submit only a single query for the highlighting. Ideally they could have a separate filter dictating which boxes to draw in the first place, and possibly multiple filters that could result in multiple colour highlighting on the same image.
