@@ -97,7 +97,7 @@ def sql_query(name, query):
         query_text = f.read()
         con = sqlite3.connect(db_path)
         cur = con.cursor()
-        cur.execute(query_text)
+        cur.execute(query_text, tuple(request.args.keys()))
         out = cur.fetchall()
         return out
 
