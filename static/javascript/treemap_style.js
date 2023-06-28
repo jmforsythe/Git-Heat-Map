@@ -25,6 +25,10 @@ const SVG_STYLE = `
     stroke: lightblue;
 }
 
+.svg_submodule .svg_box_selected {
+    stroke: orange;
+}
+
 .svg_text {
     visibility: hidden;
     font-family: monospace;

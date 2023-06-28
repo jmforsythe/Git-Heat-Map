@@ -4,6 +4,7 @@
 *Map showing the files in cpython that Guido van Rossum changed the most;
 full SVG image available in repo*
 
+## Now with submodule support
 ## Website now available
 
 A version of this program is now available for use at [heatmap.jonathanforsythe.co.uk](https://heatmap.jonathanforsythe.co.uk)
@@ -82,9 +83,6 @@ For this test I filtered each repo by its most prominent authors:
 These times are with `minimum size drawn = 0`, on very large repositories, so the performance is not completely unreasonable. This does not include the time for the browser to actually render the svg, which can take longer.
 
 ## Wanted features
-
-### Submodule tracking
-Currently the only submodule changes that can be seen are the top level commit pointer changes. In the future would like to recursively explore submodules and add their files to the database.
 
 ### Faster database generation
 Currently done using git log which can take a very long time for large repos. Will look into any other ways of getting needed information on files.

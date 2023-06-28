@@ -90,6 +90,7 @@ function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
             const row_width = height != 0 ? row_area / height : 0
             const box_height = row_width != 0 ? box_area / row_width : 0
                 let el = {"text": val.name, "area": box_area, "x": x, "y": y, "width": row_width, "height": box_height, "parent": parent_path, "level": level}
+                if ("submodule" in val && val.submodule == true) el.submodule = true;
                 if (NEST && "children" in val) el.children = squarify(x, y, row_width, box_height, val.children, `${parent_path}/${val.name}`, level+1, SVG_ROOT)
                 out.push(el)
                 y += box_height
@@ -97,6 +98,7 @@ function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
             const row_height = width != 0 ? row_area / width : 0
             const box_width = row_height != 0 ? box_area / row_height : 0
                 let el = {"text": val.name, "area": box_area, "x": x, "y": y, "width": box_width, "height": row_height, "parent": parent_path, "level": level}
+                if ("submodule" in val && val.submodule == true) el.submodule = true;
                 if (NEST && "children" in val) el.children = squarify(x, y, box_width, row_height, val.children, `${parent_path}/${val.name}`, level+1, SVG_ROOT)
                 out.push(el)
                 x += box_width
@@ -108,6 +110,7 @@ function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
 // Turns our object into an svg element
 function get_box_text_element(obj) {
     const is_leaf = !("children" in obj)
+    const is_submodule = "submodule" in obj && obj.submodule == true
 
     let element = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     let box = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
@@ -120,6 +123,7 @@ function get_box_text_element(obj) {
     element.setAttribute("height", `${obj.height}`)
     element.classList.add(`svg_level_${obj.level}`)
     if (is_leaf) element.classList.add("svg_leaf")
+    if (is_submodule) element.classList.add("svg_submodule")
     const path = `${obj.parent}/${obj.text}`
     element.setAttribute("id", `svg_path_${path}`)
 
