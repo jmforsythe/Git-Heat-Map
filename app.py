@@ -14,8 +14,11 @@ project_dir = pathlib.Path(__file__).parent
 repos_dir = project_dir / "repos"
 query_dir = project_dir / "sql"
 
-def db_list():
+def top_level_db_list():
     return (d.stem for d in repos_dir.iterdir() if d.is_dir())
+
+def db_path_list():
+    return (db.parent for db in repos_dir.rglob("*.db"))
 
 def query_list():
     return (d.stem for d in query_dir.iterdir())
@@ -24,7 +27,8 @@ def valid_db_check(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         name = kwargs["name"]
-        if name in db_list():
+        poss_path = repos_dir / pathlib.Path(name)
+        if poss_path in db_path_list():
             return func(*args, **kwargs)
         abort(404)
     return wrapper
@@ -42,7 +46,8 @@ def cache_on_db_change(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         name = kwargs["name"]
-        db_path = (repos_dir / name / name).with_suffix(".db")
+        this_repo_dir = repos_dir / pathlib.Path(name)
+        db_path = (this_repo_dir / this_repo_dir.stem).with_suffix(".db")
         server_time = db_path.stat().st_mtime
         client_time = request.if_modified_since
         if client_time != None and client_time.timestamp()+1 >= server_time:
@@ -55,19 +60,20 @@ def cache_on_db_change(func):
 
 @app.route("/")
 def index_page():
-    return render_template("index.html", db_list=sorted(db_list()))
+    return render_template("index.html", db_list=sorted(top_level_db_list()))
 
-@app.route("/<name>")
+@app.route("/<path:name>")
 @valid_db_check
 def treemap_page(name):
     return render_template("treemap.html", name=name)
 
-@app.route("/<name>/filetree.json")
+@app.route("/<path:name>/filetree.json")
 @cache_on_db_change
 @valid_db_check
 def filetree_json(name):
-    db_path = (repos_dir / name / name).with_suffix(".db")
-    json_path = repos_dir / name / "filetree.json"
+    this_repo_dir = repos_dir / pathlib.Path(name)
+    db_path = (this_repo_dir / this_repo_dir.stem).with_suffix(".db")
+    json_path = this_repo_dir / "filetree.json"
     if not json_path.is_file():
         with open(json_path, "wb") as f:
             json = databaseToJSON.get_json_from_db(db_path)
@@ -77,7 +83,7 @@ def filetree_json(name):
         with open(json_path, "rb") as f:
             return f.read().decode(errors="replace")
 
-@app.route("/<name>/highlight.json")
+@app.route("/<path:name>/highlight.json")
 @cache_on_db_change
 @valid_db_check
 def highight_json(name):
@@ -86,12 +92,21 @@ def highight_json(name):
     params_frozen = frozenset(params.items())
     return get_highlight_json(name, params_frozen)
 
-@app.route("/<name>/query/<query>")
+@app.route("/<path:name>/.gitmodules")
+@cache_on_db_change
+@valid_db_check
+def submodule_list(name):
+    this_repo_dir = repos_dir / pathlib.Path(name)
+    with open(this_repo_dir / ".gitmodules") as f:
+        return f.read().splitlines()
+
+@app.route("/<path:name>/query/<query>")
 @cache_on_db_change
 @valid_db_check
 @valid_query_check
 def sql_query(name, query):
-    db_path = (repos_dir / name / name).with_suffix(".db")
+    this_repo_dir = repos_dir / pathlib.Path(name)
+    db_path = (this_repo_dir / this_repo_dir.stem).with_suffix(".db")
     query_path = (project_dir / "sql" / query).with_suffix(".sql")
     with open(query_path) as f:
         query_text = f.read()
@@ -103,7 +118,8 @@ def sql_query(name, query):
 
 @functools.lru_cache(maxsize=100)
 def get_highlight_json(name, params):
-    db_path = (repos_dir / name / name).with_suffix(".db")
+    this_repo_dir = repos_dir / pathlib.Path(name)
+    db_path = (this_repo_dir / this_repo_dir.stem).with_suffix(".db")
     params_dict = {a[0]: a[1] for a in params}
     query, sql_params = databaseToJSON.get_filtered_query(params_dict)
     return databaseToJSON.get_json_from_db(db_path, query, sql_params)

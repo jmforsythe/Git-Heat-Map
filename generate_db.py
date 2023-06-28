@@ -1,4 +1,6 @@
 import sys
+import os
+import subprocess
 import pathlib
 
 import git_database
@@ -27,21 +29,17 @@ def generate_db(log_output, database_path):
 
     return last_commit
 
-def main():
-    argc = len(sys.argv)
-    if argc < 2:
-        print("No repo supplied")
-        return
+def get_submodules(source_path):
+    l = subprocess.Popen(f"git -C {source_path}" + r" config -z --file .gitmodules --get-regexp submodule\..*\.path", stdout=subprocess.PIPE).stdout.read().split(b"\0")
+    return [pathlib.Path(os.fsdecode(i.splitlines()[1])) for i in l if len(i)]
 
-    repos_dir = pathlib.Path(__file__).parent / "repos"
-    repos_dir.mkdir(exist_ok=True)
-
-    source_path = pathlib.Path(sys.argv[1])
-
+def generate_recursive(source_path, source_path_parent, dest_dir_parent):
+    print(source_path)
     repo_name = source_path.stem
 
-    dest_dir = repos_dir / repo_name
-    dest_dir.mkdir(exist_ok=True)
+    dest_dir = dest_dir_parent / source_path.relative_to(source_path_parent)
+
+    dest_dir.mkdir(parents=True, exist_ok=True)
     database_path = (dest_dir / repo_name).with_suffix(".db")
 
     last_commit_file = dest_dir / "lastcommit.txt"
@@ -61,8 +59,28 @@ def main():
         with open(last_commit_file, "w") as f:
             f.write(last_commit)
 
-
     print(f"Database generated at \"{database_path.absolute()}\"")
+
+    submodule_paths = get_submodules(source_path)
+    for p in submodule_paths:
+        generate_recursive(source_path / p, source_path, dest_dir)
+
+    submodules_file = dest_dir / ".gitmodules"
+    with open(submodules_file, "w") as f:
+        f.writelines("\n".join(p.as_posix() for p in submodule_paths))
+
+def main():
+    argc = len(sys.argv)
+    if argc < 2:
+        print("No repo supplied")
+        return
+
+    repos_dir = pathlib.Path(__file__).parent / "repos"
+    repos_dir.mkdir(exist_ok=True)
+
+    source_path = pathlib.Path(sys.argv[1])
+
+    generate_recursive(source_path, source_path.parent, repos_dir)
 
 if __name__ == "__main__":
     main()
