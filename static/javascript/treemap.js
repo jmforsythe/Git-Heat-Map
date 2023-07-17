@@ -321,7 +321,8 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
         const min_val = objs_to_highlight.reduce((prev, cur) => Math.min(prev, highlight_func(cur)), Infinity)
         // We want to scale using a log curve where f(max_val) = 1 and f(min_val) = 0
         // This works with log_{max_val+1-min_val}(x+1-min_val)
-        objs_to_highlight.forEach((obj) => obj.highlight(hue, Math.log(highlight_func(obj)+1-min_val)/Math.log(max_val+1-min_val)))
+        if (max_val > min_val) objs_to_highlight.forEach((obj) => obj.highlight(hue, Math.log(highlight_func(obj) + 1 - min_val) / Math.log(max_val + 1 - min_val)))
+        else if (min_val > 0) objs_to_highlight.forEach((obj) => obj.highlight(hue, 1))
         set_alt_text({"children": obj_tree, "set_title": () => {}}, highlighting_obj)
     }
 }
@@ -343,7 +344,7 @@ function get_drawing_params() {
 
 async function display_filetree_with_params(filetree_params, highlight_params, hue) {
     highlighting_obj_global = await JSON.parse(loadFile(`/${DATABASE_NAME}/highlight.json`, highlight_params))
-    populate_submodules_highlight("", highlight_params)
+    highlight_submodules(SUBMODULE_TREE, highlight_params);
     back_stack = []
     display_filetree_path(filetree_obj_global, highlighting_obj_global, "", hue)
 }
@@ -352,23 +353,32 @@ function get_submodule_names(database_name) {
     return JSON.parse(loadFile(`/${DATABASE_NAME}/${database_name}/.gitmodules`))
 }
 
-function populate_submodules(parent_name) {
-    const submodule_names = get_submodule_names(parent_name)
-    submodule_names.forEach((name) => {
-        const filetree_path = `/${DATABASE_NAME}${parent_name}/${name}/filetree.json`
+function get_submodule_tree(database_name) {
+    let children = get_submodule_names(database_name)
+    return {
+        path: database_name,
+        submodules: children.map((child_name) =>
+            get_submodule_tree(`${database_name}/${child_name}`)
+        ),
+        enabled: true
+    }
+}
+
+function populate_submodules(tree) {
+    if (tree.enabled) tree.submodules.forEach((submodule) => {
+        const filetree_path = `/${DATABASE_NAME}/${submodule.path}/filetree.json`
         const filetree = JSON.parse(loadFile(filetree_path))
-        insert_subtree(filetree_obj_global, filetree, `${parent_name}/${name}`)
-        populate_submodules(`${parent_name}/${name}`)
+        insert_subtree(filetree_obj_global, filetree, submodule.path)
+        populate_submodules(submodule)
     })
 }
 
-function populate_submodules_highlight(parent_name, highlight_params) {
-    const submodule_names = get_submodule_names(parent_name)
-    submodule_names.forEach((name) => {
-        const highlight_path = `/${DATABASE_NAME}${parent_name}/${name}/highlight.json`
+function highlight_submodules(tree, highlight_params) {
+    if (tree.enabled) tree.submodules.forEach((submodule) => {
+        const highlight_path = `/${DATABASE_NAME}/${submodule.path}/highlight.json`
         const highlight = JSON.parse(loadFile(highlight_path, highlight_params))
-        insert_subtree(highlighting_obj_global, highlight, `${parent_name}/${name}`)
-        populate_submodules_highlight(`${parent_name}/${name}`, highlight_params)
+        insert_subtree(highlighting_obj_global, highlight, submodule.path)
+        highlight_submodules(submodule, highlight_params)
     })
 }
 
@@ -378,7 +388,8 @@ function main() {
 }
 
 let filetree_obj_global = JSON.parse(loadFile(`/${DATABASE_NAME}/filetree.json`))
-populate_submodules("")
+let SUBMODULE_TREE = get_submodule_tree("")
+populate_submodules(SUBMODULE_TREE)
 sort_by_val(filetree_obj_global)
 let highlighting_obj_global = {"name": "/", "val": 0, "children": []}
 let back_stack = []
