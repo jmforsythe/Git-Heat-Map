@@ -343,7 +343,9 @@ function get_drawing_params() {
 }
 
 async function display_filetree_with_params(filetree_params, highlight_params, hue) {
-    highlighting_obj_global = await JSON.parse(loadFile(`/${DATABASE_NAME}/highlight.json`, highlight_params))
+    filetree_obj_global = JSON.parse(loadFile(`/${DATABASE_NAME}/filetree.json`, filetree_params))
+    sort_by_val(filetree_obj_global)
+    highlighting_obj_global = JSON.parse(loadFile(`/${DATABASE_NAME}/highlight.json`, highlight_params))
     highlight_submodules(SUBMODULE_TREE, highlight_params);
     back_stack = []
     display_filetree_path(filetree_obj_global, highlighting_obj_global, "", hue)
