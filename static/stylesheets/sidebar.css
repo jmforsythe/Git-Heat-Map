@@ -136,3 +136,35 @@ input[type=number] {
     align-items: center;
     width: 100%;
 }
+
+.hidden {
+    display: none;
+}
+
+.checkbox_tree {
+    display: flex;
+    flex-direction: column;
+    border: black 1px solid;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    padding: 2%;
+    margin: 2%;
+}
+
+.checkbox_tree ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.checkbox_tree ul li {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.checkbox_tree ul li label {
+    display: inherit;
+}

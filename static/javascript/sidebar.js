@@ -68,6 +68,41 @@ function get_include_exclude(filter_name, filter_id) {
     return out
 }
 
+function submodule_tree_list_generator(tree) {
+    let child_lists = tree.submodules.map((child_tree) => submodule_tree_list_generator(child_tree))
+    let li = document.createElement("li")
+    let label = document.createElement("label")
+    let input = document.createElement("input")
+    input.type = "checkbox"
+    input.checked = tree.enabled
+    input.addEventListener(("change"), (event) => {
+        tree.enabled = input.checked
+    })
+    let text = document.createTextNode(tree.path)
+    label.appendChild(input)
+    label.appendChild(text)
+    li.appendChild(label)
+    if (child_lists.length > 0) {
+        let ul = document.createElement("ul")
+        child_lists.forEach((c) => ul.appendChild(c))
+        li.appendChild(ul)
+    }
+    return li
+}
+
+function submodule_tree_setup() {
+    let el = document.getElementById("submodule_tree")
+    el.classList.add("hidden")
+    if (SUBMODULE_TREE.submodules.length > 0) {
+        let ul = document.createElement("ul")
+        SUBMODULE_TREE.submodules.forEach((submodule) => {
+            ul.appendChild(submodule_tree_list_generator(submodule))
+        })
+        el.appendChild(ul)
+        el.classList.remove("hidden")
+    }
+}
+
 function text_depth_setup() {
     let el = document.getElementById("text_depth_number")
     el.addEventListener("input", (event) => {
@@ -204,6 +239,7 @@ function main() {
     filter_entry_setup("commit_filter")
     filter_entry_setup("filename_filter")
     date_entry_setup("datetime_filter")
+    submodule_tree_setup()
     text_depth_setup()
     size_picker_setup()
     color_picker_setup()

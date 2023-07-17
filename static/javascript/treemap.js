@@ -345,22 +345,23 @@ function get_drawing_params() {
 async function display_filetree_with_params(filetree_params, highlight_params, hue) {
     filetree_obj_global = JSON.parse(loadFile(`/${DATABASE_NAME}/filetree.json`, filetree_params))
     sort_by_val(filetree_obj_global)
+    populate_submodules(SUBMODULE_TREE)
     highlighting_obj_global = JSON.parse(loadFile(`/${DATABASE_NAME}/highlight.json`, highlight_params))
     highlight_submodules(SUBMODULE_TREE, highlight_params);
     back_stack = []
     display_filetree_path(filetree_obj_global, highlighting_obj_global, "", hue)
 }
 
-function get_submodule_names(database_name) {
-    return JSON.parse(loadFile(`/${DATABASE_NAME}/${database_name}/.gitmodules`))
+function get_submodule_names(submoudle_path) {
+    return JSON.parse(loadFile(`/${DATABASE_NAME}${submoudle_path}/.gitmodules`))
 }
 
-function get_submodule_tree(database_name) {
-    let children = get_submodule_names(database_name)
+function get_submodule_tree(submoudle_path) {
+    let children = get_submodule_names(submoudle_path)
     return {
-        path: database_name,
+        path: submoudle_path,
         submodules: children.map((child_name) =>
-            get_submodule_tree(`${database_name}/${child_name}`)
+            get_submodule_tree(`${submoudle_path}/${child_name}`)
         ),
         enabled: true
     }
@@ -368,7 +369,8 @@ function get_submodule_tree(database_name) {
 
 function populate_submodules(tree) {
     if (tree.enabled) tree.submodules.forEach((submodule) => {
-        const filetree_path = `/${DATABASE_NAME}/${submodule.path}/filetree.json`
+        if (!submodule.enabled) return
+        const filetree_path = `/${DATABASE_NAME}${submodule.path}/filetree.json`
         const filetree = JSON.parse(loadFile(filetree_path))
         insert_subtree(filetree_obj_global, filetree, submodule.path)
         populate_submodules(submodule)
@@ -377,7 +379,8 @@ function populate_submodules(tree) {
 
 function highlight_submodules(tree, highlight_params) {
     if (tree.enabled) tree.submodules.forEach((submodule) => {
-        const highlight_path = `/${DATABASE_NAME}/${submodule.path}/highlight.json`
+        if (!submodule.enabled) return
+        const highlight_path = `/${DATABASE_NAME}${submodule.path}/highlight.json`
         const highlight = JSON.parse(loadFile(highlight_path, highlight_params))
         insert_subtree(highlighting_obj_global, highlight, submodule.path)
         highlight_submodules(submodule, highlight_params)
