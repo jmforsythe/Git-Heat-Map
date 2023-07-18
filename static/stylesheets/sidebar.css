@@ -159,12 +159,8 @@ input[type=number] {
     width: 100%;
 }
 
-.checkbox_tree ul li {
+.checkbox_tree ul li label {
     display: inline-flex;
     flex-direction: row;
     justify-content: flex-start;
-}
-
-.checkbox_tree ul li label {
-    display: inherit;
 }
