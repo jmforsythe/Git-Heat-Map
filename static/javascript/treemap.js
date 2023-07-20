@@ -287,6 +287,9 @@ function draw_tree(obj_tree, SVG_ROOT) {
 function get_objs_to_highlight(obj_tree, highlighting_obj) {
     let out = []
     if ("children" in highlighting_obj) highlighting_obj.children.forEach((child) => {
+        if (!"children" in obj_tree) {
+            console.error(`Searching for ${child.name} in`, obj_tree)
+	}
         obj_tree_child = obj_tree.children.find((child2) => child2.text == child.name)
         if (obj_tree_child) out.push(...get_objs_to_highlight(obj_tree_child, child))
     })
@@ -299,7 +302,15 @@ function get_objs_to_highlight(obj_tree, highlighting_obj) {
 
 function set_alt_text(obj_tree, highlighting_obj) {
     if ("children" in highlighting_obj) highlighting_obj.children.forEach((child) => {
-        set_alt_text(obj_tree.children.find((child2) => child2.text == child.name), child)
+        if (!"children" in obj_tree) {
+            console.error(`Searching for ${child.name} in`, obj_tree)
+	}
+        const obj_to_set_text = obj_tree.children.find((child2) => child2.text == child.name)
+        if (obj_to_set_text == undefined) {
+            console.error(`Could not find ${child.name} in`, obj_tree)
+            return
+	}
+        set_alt_text(obj_to_set_text, child)
     })
     obj_tree.set_title(highlighting_obj.val)
 }
@@ -363,8 +374,8 @@ async function display_filetree_with_params(filetree_params, highlight_params, h
     let filetree_promise = fetch_with_params(`/${DATABASE_NAME}/filetree.json`, filetree_params)
     filetree_obj_global = await filetree_promise
     sort_by_val(filetree_obj_global)
-    populate_submodules(SUBMODULE_TREE)
-    if (highlight_params != {}) {
+    await populate_submodules(SUBMODULE_TREE)
+    if (highlight_params != null) {
         let highlight_promise = fetch_with_params(`/${DATABASE_NAME}/highlight.json`, highlight_params)
         highlighting_obj_global = await highlight_promise
     }
@@ -388,14 +399,14 @@ function get_submodule_tree(submoudle_path) {
     }
 }
 
-function populate_submodules(tree) {
-    if (tree.enabled) tree.submodules.forEach(async (submodule) => {
+async function populate_submodules(tree) {
+    if (tree.enabled) return Promise.all(tree.submodules.map(async (submodule) => {
         if (!submodule.enabled) return
         const filetree_path = `/${DATABASE_NAME}${submodule.path}/filetree.json`
         const filetree = await fetch_with_params(filetree_path)
         insert_subtree(filetree_obj_global, filetree, submodule.path)
-        populate_submodules(submodule)
-    })
+        return populate_submodules(submodule)
+    }))
 }
 
 function highlight_submodules(tree, highlight_params) {
@@ -409,7 +420,7 @@ function highlight_submodules(tree, highlight_params) {
 }
 
 async function main() {
-    display_filetree_with_params({}, {}, "", 0)
+    display_filetree_with_params({}, null, "", 0)
     update_styles(document.getElementById("treemap_root_svg"), 1)
 }
 
