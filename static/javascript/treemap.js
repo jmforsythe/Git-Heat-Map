@@ -1,18 +1,35 @@
 // Request file with with given parameters
-function loadFile(filePath, paramsObj) {
+function loadFile(file_path, params_obj) {
     let result = null
     let xmlhttp = new XMLHttpRequest()
-    const searchParams = new URLSearchParams()
-    for (const key in paramsObj) {
-        paramsObj[key].forEach((value) => searchParams.append(key, value))
-    }
-    if (searchParams.toString() != "") filePath += `?${searchParams.toString()}`
-    xmlhttp.open("GET", filePath, false)
+    xmlhttp.open("GET", path_and_params_to_url(file_path, params_obj), false)
     xmlhttp.send()
     if (xmlhttp.status==200) {
         result = xmlhttp.responseText
     }
     return result
+}
+
+function fetch_with_params(file_path, params_obj) {
+    return fetch(path_and_params_to_url(file_path, params_obj)).then((response) => {
+        if (response.ok) {
+            return response.json()
+        }
+        return null
+    })
+}
+
+function path_and_params_to_url(file_path, params_obj) {
+    const search_params_str = params_to_url_params(params_obj).toString()
+    return file_path + (search_params_str != "" ? `?${search_params_str}` : "")
+}
+
+function params_to_url_params(params_obj) {
+    const search_params = new URLSearchParams()
+    for (const key in params_obj) {
+        params_obj[key].forEach((value) => search_params.append(key, value))
+    }
+    return search_params
 }
 
 function sort_by_val(j) {
@@ -343,10 +360,14 @@ function get_drawing_params() {
 }
 
 async function display_filetree_with_params(filetree_params, highlight_params, hue) {
-    filetree_obj_global = JSON.parse(loadFile(`/${DATABASE_NAME}/filetree.json`, filetree_params))
+    let filetree_promise = fetch_with_params(`/${DATABASE_NAME}/filetree.json`, filetree_params)
+    filetree_obj_global = await filetree_promise
     sort_by_val(filetree_obj_global)
     populate_submodules(SUBMODULE_TREE)
-    highlighting_obj_global = JSON.parse(loadFile(`/${DATABASE_NAME}/highlight.json`, highlight_params))
+    if (highlight_params != {}) {
+        let highlight_promise = fetch_with_params(`/${DATABASE_NAME}/highlight.json`, highlight_params)
+        highlighting_obj_global = await highlight_promise
+    }
     highlight_submodules(SUBMODULE_TREE, highlight_params);
     back_stack = []
     display_filetree_path(filetree_obj_global, highlighting_obj_global, "", hue)
@@ -368,10 +389,10 @@ function get_submodule_tree(submoudle_path) {
 }
 
 function populate_submodules(tree) {
-    if (tree.enabled) tree.submodules.forEach((submodule) => {
+    if (tree.enabled) tree.submodules.forEach(async (submodule) => {
         if (!submodule.enabled) return
         const filetree_path = `/${DATABASE_NAME}${submodule.path}/filetree.json`
-        const filetree = JSON.parse(loadFile(filetree_path))
+        const filetree = await fetch_with_params(filetree_path)
         insert_subtree(filetree_obj_global, filetree, submodule.path)
         populate_submodules(submodule)
     })
@@ -387,16 +408,14 @@ function highlight_submodules(tree, highlight_params) {
     })
 }
 
-function main() {
-    display_filetree_path(filetree_obj_global, highlighting_obj_global, "", 0)
+async function main() {
+    display_filetree_with_params({}, {}, "", 0)
     update_styles(document.getElementById("treemap_root_svg"), 1)
 }
 
-let filetree_obj_global = JSON.parse(loadFile(`/${DATABASE_NAME}/filetree.json`))
-let SUBMODULE_TREE = get_submodule_tree("")
-populate_submodules(SUBMODULE_TREE)
-sort_by_val(filetree_obj_global)
+let filetree_obj_global = {}
 let highlighting_obj_global = {"name": "/", "val": 0, "children": []}
+let SUBMODULE_TREE = get_submodule_tree("")
 let back_stack = []
 
 main()
