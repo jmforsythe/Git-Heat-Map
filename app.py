@@ -97,6 +97,9 @@ def highight_json(name):
 @valid_db_check
 def submodule_list(name):
     this_repo_dir = repos_dir / pathlib.Path(name)
+    gitmodules_path = this_repo_dir / ".gitmodules"
+    if not gitmodules_path.is_file():
+        return []
     with open(this_repo_dir / ".gitmodules") as f:
         return f.read().splitlines()
 

@@ -138,7 +138,7 @@ input[type=number] {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .checkbox_tree {
