@@ -32,3 +32,13 @@ table {
 table, td, th {
     border: 1px solid black;
 }
+
+.link_button {
+    border: none;
+    background: none;
+    padding: 0;
+    margin: 0;
+    text-decoration: underline;
+    cursor: pointer;
+    color: blue;
+}

@@ -1,7 +1,6 @@
 SELECT RANK() OVER (ORDER BY SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved) DESC) AS "Rank", 
        SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved) AS "Total changes",
-       files.filePath AS "File path",
-       commitAuthor.authorEmail
+       files.filePath AS "File path"
 FROM commitFile
 JOIN files ON files.fileID = commitFile.fileID
 JOIN commitAuthor ON commitFile.hash = commitAuthor.hash
