@@ -167,6 +167,10 @@ function get_box_text_element(obj) {
             back_stack.push(obj.parent)
             display_filetree_path(filetree_obj_global, highlighting_obj_global, path, get_hue())
         }
+        else element.onclick = () => {
+            update_info_box_with_file_stats(path.slice(1))
+            open_overlay()
+        }
         element.onmouseover = () => box.classList.add("svg_box_selected")
         element.onmouseout = () => box.classList.remove("svg_box_selected")
     }

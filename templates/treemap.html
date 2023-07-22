@@ -4,8 +4,11 @@
         <title>{{ name }}</title>
         <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheets/treemap.css') }}">
         <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheets/sidebar.css') }}">
+        <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stylesheets/overlay.css') }}">
     </head>
     <body>
+        <div id="overlay" onclick="close_overlay()"></div>
+        <div id="info_box"></div>
         <div id="container">
             <svg id="treemap_root_svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://w3.org/1999/xlink" width=100% height=100%>
                 <defs>
@@ -77,6 +80,7 @@
             </div>
         </div>
         <script>const DATABASE_NAME = "{{ name }}"; const QUERY_STRING = "{{ query_args }}"</script>
+        <script src="{{ url_for('static', filename='javascript/overlay.js') }}"></script>
         <script src="{{ url_for('static', filename='javascript/treemap_style.js') }}"></script>
         <script src="{{ url_for('static', filename='javascript/treemap.js') }}"></script>
         <script src="{{ url_for('static', filename='javascript/sidebar.js') }}"></script>

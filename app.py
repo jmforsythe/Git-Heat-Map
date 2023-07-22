@@ -116,7 +116,7 @@ def sql_query(name, query):
         con = sqlite3.connect(db_path)
         cur = con.cursor()
         cur.execute(query_text, tuple(request.args.keys()))
-        out = cur.fetchall()
+        out = [[i[0] for i in cur.description]] + cur.fetchall()
         return out
 
 @functools.lru_cache(maxsize=100)
