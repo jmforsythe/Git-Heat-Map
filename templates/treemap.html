@@ -23,18 +23,21 @@
         <div id="sidebar">
             <div class="sidebar_container" id="email_filter">
                 Email filter
+                <button type="button" class="link_button" onclick="browse_authors()">Browse</button>
                 <input type="text" name="email" class="text_entry"/>
                 <input type="button" value="Add email" class="text_submit"/>
                 <div class="item_list"></div>
             </div>
             <div class="sidebar_container" id="commit_filter">
                 Commit filter
+                <button type="button" class="link_button" onclick="browse_commits()">Browse</button>
                 <input type="text" name="commit" class="text_entry"/>
                 <input type="button" value="Add hash" class="text_submit"/>
                 <div class="item_list"></div>
             </div>
             <div class="sidebar_container" id="filename_filter">
                 File path filter
+                <button type="button" class="link_button" onclick="browse_files()">Browse</button>
                 <input type="text" name="filenames" class="text_entry"/>
                 <input type="button" value="Add filename" class="text_submit"/>
                 <div class="item_list"></div>

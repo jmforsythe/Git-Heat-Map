@@ -19,16 +19,34 @@ function set_info_content(...child_elements) {
     info_box.replaceChildren(...child_elements)
 }
 
+async function get_author_stats(author_email) {
+    return fetch(`/${DATABASE_NAME}/query/filesChangeMostByAuthor?`
+        + new URLSearchParams(author_email)
+    ).then(response => response.json())
+}
+
 async function get_file_stats(path) {
     return fetch(`/${DATABASE_NAME}/query/rankAuthorsByLinesChangedInPath?`
         + new URLSearchParams(path)
     ).then(response => response.json())
 }
 
-async function get_author_stats(author_email) {
-    return fetch(`/${DATABASE_NAME}/query/filesChangeMostByAuthor?`
-        + new URLSearchParams(author_email)
-    ).then(response => response.json())
+async function get_all_authors() {
+    return fetch(`/${DATABASE_NAME}/query/rankAuthorsByLinesChanged`).then(
+        response => response.json()
+    )
+}
+
+async function get_all_commits() {
+    return fetch(`/${DATABASE_NAME}/query/rankCommitsByLinesChanged`).then(
+        response => response.json()
+    )
+}
+
+async function get_all_files() {
+    return fetch(`/${DATABASE_NAME}/query/rankFilesByLinesChanged`).then(
+        response => response.json()
+    )
 }
 
 const FIELD_TO_FUNCTION = new Map([
@@ -98,4 +116,40 @@ async function update_info_box_with_author_stats(author_email) {
     h2.appendChild(document.createTextNode(author_email))
     const table = sql_repsonse_to_table(await get_author_stats(author_email))
     set_info_content(h1, h2, table)
+}
+
+async function update_info_box_all_authors() {
+    const h1 = document.createElement("h1")
+    h1.appendChild(document.createTextNode("Author emails sorted by most changes"))
+    const table = sql_repsonse_to_table(await get_all_authors())
+    set_info_content(h1, table)
+}
+
+async function browse_authors() {
+    update_info_box_all_authors()
+    open_overlay()
+}
+
+async function update_info_box_all_commits() {
+    const h1 = document.createElement("h1")
+    h1.appendChild(document.createTextNode("Commits sorted by most changes"))
+    const table = sql_repsonse_to_table(await get_all_commits())
+    set_info_content(h1, table)
+}
+
+async function browse_commits() {
+    update_info_box_all_commits()
+    open_overlay()
+}
+
+async function update_info_box_all_files() {
+    const h1 = document.createElement("h1")
+    h1.appendChild(document.createTextNode("Files sorted by most changes"))
+    const table = sql_repsonse_to_table(await get_all_files())
+    set_info_content(h1, table)
+}
+
+async function browse_files() {
+    update_info_box_all_files()
+    open_overlay()
 }
