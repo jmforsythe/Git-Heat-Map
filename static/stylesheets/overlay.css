@@ -42,3 +42,7 @@ table, td, th {
     cursor: pointer;
     color: black;
 }
+
+.add_button {
+    float: right;
+}
