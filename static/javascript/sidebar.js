@@ -118,6 +118,16 @@ function size_picker_setup() {
     })
 }
 
+function filetype_highlighting_setup() {
+    const filetype_highlighting_control = document.getElementById("filetype_highlight_control")
+    if (filetype_highlighting_control) {
+        filetype_highlighting_control.checked = USER_DEFINED_HUE
+        filetype_highlighting_control.onchange = () => {
+            USER_DEFINED_HUE = filetype_highlighting_control.checked
+        }
+    }
+}
+
 function color_picker_setup() {
     let el = document.getElementById("sidebar_color_picker")
     let input_number = el.querySelector(".color_picker_number")
@@ -159,7 +169,7 @@ function submit_query_setup() {
 }
 
 function fraction_highlighting_setup() {
-    const fraction_highlighting_control = document.getElementById("hightlight_control")
+    const fraction_highlighting_control = document.getElementById("highlight_control")
     if (fraction_highlighting_control) {
         fraction_highlighting_control.onchange = () => {
             FRACTION_HIGHLIGHTING = fraction_highlighting_control.checked
@@ -241,6 +251,7 @@ function main() {
     submodule_tree_setup()
     text_depth_setup()
     size_picker_setup()
+    filetype_highlighting_setup()
     color_picker_setup()
     submit_query_setup()
     fraction_highlighting_setup()
