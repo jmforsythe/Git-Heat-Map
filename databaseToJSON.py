@@ -4,8 +4,13 @@ import sqlite3
 def get_filtered_query(filter):
     base_query = """
         SELECT files.filePath, SUM(commitFile.linesAdded)+SUM(commitFile.linesRemoved)
-        FROM files
-        JOIN commitFile on files.fileID = commitFile.fileID JOIN_LINE
+        FROM (
+            SELECT DISTINCT commitAuthor.hash
+            FROM commitAuthor
+            WHERE WHERE_INNER_LINE
+        ) commitsFiltered
+        JOIN commitFile ON commitsFiltered.hash = commitFile.hash
+        JOIN files ON commitFile.fileID = files.fileID JOIN_LINE
         WHERE WHERE_LINE
         GROUP BY files.filePath
     """
@@ -13,17 +18,16 @@ def get_filtered_query(filter):
     params = []
     joins = set()
     wheres = ["files.filePath NOTNULL"]
+    wheres_inner = []
 
     valid_field = lambda key: key in filter and isinstance(filter[key], tuple) and len(filter[key]) > 0
 
     if valid_field("email_include"):
-        joins.add("JOIN commitAuthor on commitFile.hash = commitAuthor.hash")
-        wheres.append("(" + " OR ".join([f"commitAuthor.authorEmail LIKE ?" for email in filter["email_include"]]) + ")")
+        wheres_inner.append("(" + " OR ".join([f"commitAuthor.authorEmail LIKE ?" for email in filter["email_include"]]) + ")")
         params.extend(filter["email_include"])
 
     if valid_field("email_exclude"):
-        joins.add("JOIN commitAuthor on commitFile.hash = commitAuthor.hash")
-        wheres.append("(" + " AND ".join([f"commitAuthor.authorEmail NOT LIKE ?" for email in filter["email_exclude"]]) + ")")
+        wheres_inner.append("(" + " AND ".join([f"commitAuthor.authorEmail NOT LIKE ?" for email in filter["email_exclude"]]) + ")")
         params.extend(filter["email_exclude"])
 
     if valid_field("commit_include"):
@@ -54,7 +58,9 @@ def get_filtered_query(filter):
         date_expand = [d for r in filter["datetime_exclude"] for d in r.split(" ")]
         params.extend(date_expand)
 
-    query = base_query.replace("JOIN_LINE", " ".join(joins)).replace("WHERE_LINE", " AND ".join(wheres))
+    if len(wheres_inner) == 0:
+        wheres_inner = ["0"]
+    query = base_query.replace("JOIN_LINE", " ".join(joins)).replace("WHERE_LINE", " AND ".join(wheres)).replace("WHERE_INNER_LINE", " AND ".join(wheres_inner))
     return query, tuple(params)
 
 get_files_SQL = """
