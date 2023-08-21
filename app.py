@@ -74,14 +74,19 @@ def filetree_json(name):
     this_repo_dir = repos_dir / pathlib.Path(name)
     db_path = (this_repo_dir / this_repo_dir.stem).with_suffix(".db")
     json_path = this_repo_dir / "filetree.json"
-    if not json_path.is_file():
-        with open(json_path, "wb") as f:
-            json = databaseToJSON.get_json_from_db(db_path)
-            f.write(json.encode(errors="replace"))
-            return json
-    else:
-        with open(json_path, "rb") as f:
-            return f.read().decode(errors="replace")
+    if json_path.is_file():
+        database_change_time = db_path.stat().st_mtime
+        json_change_time = json_path.stat().st_mtime
+        if not database_change_time > json_change_time:
+            # Use cached result only if it exists and is newer than the database
+            with open(json_path, "rb") as f:
+                return f.read().decode(errors="replace")
+
+    with open(json_path, "wb") as f:
+        json = databaseToJSON.get_json_from_db(db_path)
+        f.write(json.encode(errors="replace"))
+        return json
+
 
 @app.route("/<path:name>/highlight.json")
 @cache_on_db_change
