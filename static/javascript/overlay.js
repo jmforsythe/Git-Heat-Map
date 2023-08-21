@@ -37,6 +37,12 @@ async function get_file_stats(path) {
     ).then(response => response.json())
 }
 
+async function get_file_commits(path) {
+    return fetch(`/${DATABASE_NAME}/query/rankCommitsByLinesChangedForFile?`
+        + new URLSearchParams(path)
+    ).then(response => response.json())
+}
+
 async function get_all_authors() {
     return fetch(`/${DATABASE_NAME}/query/rankAuthorsByLinesChanged`).then(
         response => response.json()
@@ -67,7 +73,7 @@ const FIELD_TO_FILTER = new Map([
     ["File path", "filename_filter"]
 ])
 
-function sql_repsonse_to_table(r) {
+function sql_response_to_table(r) {
     let column_func_map = new Map()
     let column_filter_list_map = new Map()
     const m = r.length
@@ -136,7 +142,7 @@ async function update_info_box_with_author_stats(author_email) {
     h1.appendChild(document.createTextNode("Files changed most by author"))
     const h2 = document.createElement("h2")
     h2.appendChild(document.createTextNode(author_email))
-    const table = sql_repsonse_to_table(await get_author_stats(author_email))
+    const table = sql_response_to_table(await get_author_stats(author_email))
     set_info_content(h1, h2, table)
 }
 
@@ -145,7 +151,7 @@ async function update_info_box_with_commit_stats(hash) {
     h1.appendChild(document.createTextNode("Files changed in commit"))
     const h2 = document.createElement("h2")
     h2.appendChild(document.createTextNode(hash))
-    const table = sql_repsonse_to_table(await get_commit_stats(hash))
+    const table = sql_response_to_table(await get_commit_stats(hash))
     set_info_content(h1, h2, table)
 }
 
@@ -154,14 +160,14 @@ async function update_info_box_with_file_stats(path) {
     h1.appendChild(document.createTextNode("Author emails with most changes to"))
     const h2 = document.createElement("h2")
     h2.appendChild(document.createTextNode(path))
-    const table = sql_repsonse_to_table(await get_file_stats(path))
+    const table = sql_response_to_table(await get_file_stats(path))
     set_info_content(h1, h2, table)
 }
 
 async function update_info_box_all_authors() {
     const h1 = document.createElement("h1")
     h1.appendChild(document.createTextNode("Author emails sorted by most changes"))
-    const table = sql_repsonse_to_table(await get_all_authors())
+    const table = sql_response_to_table(await get_all_authors())
     set_info_content(h1, table)
 }
 
@@ -173,7 +179,7 @@ async function browse_authors() {
 async function update_info_box_all_commits() {
     const h1 = document.createElement("h1")
     h1.appendChild(document.createTextNode("Commits sorted by most changes"))
-    const table = sql_repsonse_to_table(await get_all_commits())
+    const table = sql_response_to_table(await get_all_commits())
     set_info_content(h1, table)
 }
 
@@ -185,7 +191,7 @@ async function browse_commits() {
 async function update_info_box_all_files() {
     const h1 = document.createElement("h1")
     h1.appendChild(document.createTextNode("Files sorted by most changes"))
-    const table = sql_repsonse_to_table(await get_all_files())
+    const table = sql_response_to_table(await get_all_files())
     set_info_content(h1, table)
 }
 
