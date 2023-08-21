@@ -107,7 +107,7 @@ function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
             const row_width = height != 0 ? row_area / height : 0
             const box_height = row_width != 0 ? box_area / row_width : 0
                 let el = {"text": val.name, "area": box_area, "x": x, "y": y, "width": row_width, "height": box_height, "parent": parent_path, "level": level}
-                if ("submodule" in val && val.submodule == true) el.submodule = true;
+                if ("submodule" in val && val.submodule == true) el.submodule = true
                 if (NEST && "children" in val) el.children = squarify(x, y, row_width, box_height, val.children, `${parent_path}/${val.name}`, level+1, SVG_ROOT)
                 out.push(el)
                 y += box_height
@@ -115,7 +115,7 @@ function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
             const row_height = width != 0 ? row_area / width : 0
             const box_width = row_height != 0 ? box_area / row_height : 0
                 let el = {"text": val.name, "area": box_area, "x": x, "y": y, "width": box_width, "height": row_height, "parent": parent_path, "level": level}
-                if ("submodule" in val && val.submodule == true) el.submodule = true;
+                if ("submodule" in val && val.submodule == true) el.submodule = true
                 if (NEST && "children" in val) el.children = squarify(x, y, box_width, row_height, val.children, `${parent_path}/${val.name}`, level+1, SVG_ROOT)
                 out.push(el)
                 x += box_width
@@ -442,11 +442,11 @@ async function display_filetree_with_params(filetree_params, highlight_params, h
     if (highlight_params != null) {
         let highlight_promise = fetch_with_params(`/${DATABASE_NAME}/highlight.json`, highlight_params)
         highlighting_obj_global = await highlight_promise
-        highlight_submodules(SUBMODULE_TREE, highlight_params);
+        highlight_submodules(SUBMODULE_TREE, highlight_params)
     } else {
         highlighting_obj_global = filetree_obj_global
     }
-    highlight_submodules(SUBMODULE_TREE, highlight_params);
+    highlight_submodules(SUBMODULE_TREE, highlight_params)
     back_stack = []
     display_filetree_path(filetree_obj_global, highlighting_obj_global, "", hue)
 }

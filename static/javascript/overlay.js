@@ -1,21 +1,21 @@
 function open_overlay() {
-    const overlay = document.getElementById('overlay');
-    const info_box = document.getElementById('info_box');
+    const overlay = document.getElementById('overlay')
+    const info_box = document.getElementById('info_box')
 
-    overlay.style.display = 'block';
-    info_box.style.display = 'block';
+    overlay.style.display = 'block'
+    info_box.style.display = 'block'
 }
 
 function close_overlay() {
-    const overlay = document.getElementById('overlay');
-    const info_box = document.getElementById('info_box');
+    const overlay = document.getElementById('overlay')
+    const info_box = document.getElementById('info_box')
 
-    overlay.style.display = 'none';
-    info_box.style.display = 'none';
+    overlay.style.display = 'none'
+    info_box.style.display = 'none'
 }
 
 function set_info_content(...child_elements) {
-    const info_box = document.getElementById('info_box');
+    const info_box = document.getElementById('info_box')
     info_box.replaceChildren(...child_elements)
 }
 
