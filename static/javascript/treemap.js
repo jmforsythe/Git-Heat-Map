@@ -442,6 +442,9 @@ async function display_filetree_with_params(filetree_params, highlight_params, h
     if (highlight_params != null) {
         let highlight_promise = fetch_with_params(`/${DATABASE_NAME}/highlight.json`, highlight_params)
         highlighting_obj_global = await highlight_promise
+        highlight_submodules(SUBMODULE_TREE, highlight_params);
+    } else {
+        highlighting_obj_global = filetree_obj_global
     }
     highlight_submodules(SUBMODULE_TREE, highlight_params);
     back_stack = []
