@@ -253,19 +253,24 @@ function get_extension(filename) {
     return filename.split(".").pop()
 }
 
-let EXTENSION_SET = new Set()
 let EXTENSION_MAP = new Map()
+let EXTENSION_AREA = new Map()
+let EXTENSION_NUM_FILES = new Map()
 
-function filetype_hue(filename) {
-    const extension = get_extension(filename)
-    if (extension === null || extension === undefined) return null
-    const bytes = Uint8Array.from(extension.split("").map(c => c.charCodeAt(0)))
-    let hue = 0
-    bytes.forEach((b, index) => {
-        hue += (((b%26)+7)%26) * (360/26) / (26**index)
-    })
-    return hue
-    return EXTENSION_MAP.get(get_extension(filename))
+function extension_hue(extension) {
+    if (!EXTENSION_MAP.has(extension)) {
+        if (extension === null || extension === undefined) {
+            EXTENSION_MAP.set(extension, null)
+        } else {
+            const bytes = Uint8Array.from(extension.split("").map(c => c.charCodeAt(0)))
+            let hue = 0
+            bytes.forEach((b, index) => {
+                hue += ((((b%26)+7)%26)+1) * (360/27) / (27**index)
+            })
+            EXTENSION_MAP.set(extension, hue)
+        }
+    }
+    return EXTENSION_MAP.get(extension)
 }
 
 USER_DEFINED_HUE = false
@@ -304,7 +309,15 @@ function draw_tree(obj_tree, SVG_ROOT) {
 
     obj_tree.filetype_highlight = () => {
         if (!obj_tree || "children" in obj_tree) return
-        const hue = filetype_hue(obj_tree.text)
+        const extension = get_extension(obj_tree.text)
+        const hue = extension_hue(extension)
+
+        if (!EXTENSION_AREA.has(extension)) EXTENSION_AREA.set(extension, 0)
+        EXTENSION_AREA.set(extension, EXTENSION_AREA.get(extension) + obj_tree.area)
+
+        if (!EXTENSION_NUM_FILES.has(extension)) EXTENSION_NUM_FILES.set(extension, 0)
+        EXTENSION_NUM_FILES.set(extension, EXTENSION_NUM_FILES.get(extension) + 1)
+
         if (hue === null || hue === undefined) return
         obj_tree.hue_filetype = hue
         obj_tree.update_highlight()
@@ -390,18 +403,10 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
 
     obj_tree.forEach((val) => draw_tree(val, SVG_ROOT))
 
+    EXTENSION_MAP.clear()
+    EXTENSION_AREA.clear()
+    EXTENSION_NUM_FILES.clear()
     const all_objs = get_all_objs({"children": obj_tree})
-    if (EXTENSION_SET.size == 0) {
-        all_objs.forEach((obj) => {
-            EXTENSION_SET.add(get_extension(obj.text))
-        })
-        let l = []
-        EXTENSION_SET.forEach((val) => l.push(val))
-        const n = l.length
-        l.forEach((extension, index) => {
-            EXTENSION_MAP.set(extension, index * (360 / n))
-        })
-    }
     all_objs.forEach(obj => obj.filetype_highlight())
 
     let objs_to_highlight = get_objs_to_highlight({"children": obj_tree}, highlighting_obj)
