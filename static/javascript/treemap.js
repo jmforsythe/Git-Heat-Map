@@ -218,16 +218,22 @@ function get_child_from_path(obj, path) {
 
 function insert_subtree(parent, to_insert, path) {
     let cur_child_val = 0
-    let new_child_val = to_insert.val
+    let new_child_val = 0
     if (path[0] == "/") path = path.slice(1)
     if (path == "") {
         parent = to_insert
     } else {
         const index = path.indexOf("/")
         if (index == -1) {
-            const poss_children = parent.children.filter((child) => child.name == path)
+            let poss_children = parent.children.filter((child) => child.name == path)
+            if (poss_children.length == 0) {
+                const tmp = {"val": 0}
+                poss_children.push(tmp)
+                parent.children.push(tmp)
+            }
             if (poss_children.length == 1) {
                 cur_child_val = poss_children[0].val
+                new_child_val = to_insert.val
                 poss_children[0].name = path
                 poss_children[0].val = to_insert.val
                 poss_children[0].children = to_insert.children
@@ -442,8 +448,8 @@ function get_drawing_params() {
 async function display_filetree_with_params(filetree_params, highlight_params, hue) {
     let filetree_promise = fetch_with_params(`/${DATABASE_NAME}/filetree.json`, filetree_params)
     filetree_obj_global = await filetree_promise
-    sort_by_val(filetree_obj_global)
     await populate_submodules(SUBMODULE_TREE)
+    sort_by_val(filetree_obj_global)
     if (highlight_params != null) {
         let highlight_promise = fetch_with_params(`/${DATABASE_NAME}/highlight.json`, highlight_params)
         highlighting_obj_global = await highlight_promise
@@ -451,7 +457,6 @@ async function display_filetree_with_params(filetree_params, highlight_params, h
     } else {
         highlighting_obj_global = filetree_obj_global
     }
-    highlight_submodules(SUBMODULE_TREE, highlight_params)
     back_stack = []
     display_filetree_path(filetree_obj_global, highlighting_obj_global, "", hue)
 }
