@@ -121,6 +121,7 @@ function handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT) {
                 x += box_width
         }
     })
+    MAX_DEPTH = Math.max(MAX_DEPTH, level+1)
     return out
 }
 
@@ -145,7 +146,7 @@ function get_box_text_element(obj) {
     element.setAttribute("id", `svg_path_${path}`)
 
     box.classList.add("svg_box")
-    box.setAttribute("fill", "url(#Gradient2)")
+    box.setAttribute("fill", `url(#Gradient${obj.level})`)
     box.setAttribute("fill-opacity", "20%")
 
     const txt = document.createTextNode(obj.text)
@@ -431,6 +432,7 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
 }
 
 function display_filetree_path(filetree_obj, highlighting_obj, path, hue) {
+    MAX_DEPTH = 0
     const [SVG_ROOT, x, y, aspect_ratio] = get_drawing_params()
     display_filetree(get_child_from_path(filetree_obj, path), get_child_from_path(highlighting_obj, path), SVG_ROOT, x, y, aspect_ratio, path, hue)
 }
@@ -497,13 +499,15 @@ function highlight_submodules(tree, highlight_params) {
 }
 
 async function main() {
-    display_filetree_with_params({}, null, "", 0)
+    await display_filetree_with_params({}, null, "", 0)
     update_styles(document.getElementById("treemap_root_svg"), 1)
+    update_defs(document.getElementById("treemap_root_svg"), MAX_DEPTH)
 }
 
 let filetree_obj_global = {}
 let highlighting_obj_global = {"name": "/", "val": 0, "children": []}
 let SUBMODULE_TREE = get_submodule_tree("")
 let back_stack = []
+let MAX_DEPTH = 0
 
 main()
