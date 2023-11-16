@@ -1,6 +1,6 @@
 # Git-Heat-Map
 
-![Map showing the files in cpython that Guido van Rossum changed the most](example_image.png)
+![Map showing the files in cpython that Guido van Rossum changed the most](img/example_image.png)
 *Map showing the files in cpython that Guido van Rossum changed the most;
 full SVG image available in repo*
 
@@ -13,7 +13,7 @@ A version of this program is now available for use at [heatmap.jonathanforsythe.
 ## Basic use guide
 
 * Generate database with `python generate_db.py {path_to_repo_dir}`
-* Install `flask` from pip
+* Create virtual environment with `python -m venv .` and install required modules with `pip install -r requirements.txt`
 * Run web server with `python app.py` or `flask run` (`flask run --host=<ip>` to run on that ip address, with `0.0.0.0` being used for all addresses on that machine)
 * Connect on `127.0.0.1:5000`
 * Available repos will be displayed, select the one you want to view

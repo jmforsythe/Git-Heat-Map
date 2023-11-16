@@ -5,3 +5,6 @@ __pycache__/
 *.json
 *.log
 repos/*
+Lib/
+Scripts/
+pyvenv.cfg

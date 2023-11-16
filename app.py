@@ -3,9 +3,9 @@ import functools
 import sqlite3
 import functools
 
-from flask import Flask, render_template, request, abort, make_response
+from server import database_to_JSON
 
-import databaseToJSON
+from flask import Flask, render_template, request, abort, make_response
 
 app = Flask(__name__)
 app.static_folder = "static"
@@ -83,7 +83,7 @@ def filetree_json(name):
                 return f.read().decode(errors="replace")
 
     with open(json_path, "wb") as f:
-        json = databaseToJSON.get_json_from_db(db_path)
+        json = database_to_JSON.get_json_from_db(db_path)
         f.write(json.encode(errors="replace"))
         return json
 
@@ -129,8 +129,8 @@ def get_highlight_json(name, params):
     this_repo_dir = repos_dir / pathlib.Path(name)
     db_path = (this_repo_dir / this_repo_dir.stem).with_suffix(".db")
     params_dict = {a[0]: a[1] for a in params}
-    query, sql_params = databaseToJSON.get_filtered_query(params_dict)
-    return databaseToJSON.get_json_from_db(db_path, query, sql_params)
+    query, sql_params = database_to_JSON.get_filtered_query(params_dict)
+    return database_to_JSON.get_json_from_db(db_path, query, sql_params)
 
 if __name__ == "__main__":
     app.run()

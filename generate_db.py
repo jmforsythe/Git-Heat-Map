@@ -3,8 +3,7 @@ import os
 import subprocess
 import pathlib
 
-import git_database
-import git_log_format
+from db_generation import git_database, git_log_format
 
 def generate_db(log_output, database_path):
     con = git_database.db_connection(database_path)
