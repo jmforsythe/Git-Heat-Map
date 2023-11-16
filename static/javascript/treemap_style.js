@@ -86,7 +86,7 @@ function update_defs(node, gradient_depth=10) {
         for (const attr in gradient_attrs) {
             linearGradient.setAttribute(attr, gradient_attrs[attr])
         }
-        const stop1_opacity = Math.min(1,0.3+0.2*i)
+        const stop1_opacity = Math.min(1,0.25+0.15*i)
         const stop2_opacity = Math.max(0, 0.2)
         const stop1 = document.createElementNS("http://www.w3.org/2000/svg", "stop")
         stop1.setAttribute("offset", "0%")
