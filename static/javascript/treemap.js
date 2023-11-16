@@ -77,7 +77,7 @@ function squarify(x, y, width, height, children_in, parent_path, level, SVG_ROOT
         else break
     }
     const i = row.length
-    children_out.push(...handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT))
+    children_out = children_out.concat(handle_row(row, x, y, width, height, parent_path, level, SVG_ROOT))
 
     let area = row.reduce((acc, c) => acc+c.val, 0)
     let size_used = area / size
@@ -91,7 +91,7 @@ function squarify(x, y, width, height, children_in, parent_path, level, SVG_ROOT
 
     const tmp = children.slice(i)
     if (tmp && tmp.length != 0) {
-        children_out.push(...squarify(x, y, width, height, children.slice(i), parent_path, level, SVG_ROOT))
+        children_out = children_out.concat(squarify(x, y, width, height, children.slice(i), parent_path, level, SVG_ROOT))
     }
     return children_out
 }
@@ -348,7 +348,7 @@ function get_objs_to_highlight(obj_tree, highlighting_obj) {
             console.error(`Searching for ${child.name} in`, obj_tree)
         }
         obj_tree_child = obj_tree.children.find((child2) => child2.text == child.name)
-        if (obj_tree_child) out.push(...get_objs_to_highlight(obj_tree_child, child))
+        if (obj_tree_child) out = out.concat(get_objs_to_highlight(obj_tree_child, child))
     })
     else if (highlighting_obj.val > 0) {
         obj_tree.highlight_value = highlighting_obj.val
@@ -361,7 +361,7 @@ function get_all_objs(obj_tree) {
     let out = []
     if ("children" in obj_tree) {
         obj_tree.children.forEach((child) => {
-            out.push(...get_all_objs(child))
+            out = out.concat(get_all_objs(child))
         })
     }
     else {
@@ -407,7 +407,6 @@ function display_filetree(filetree_obj, highlighting_obj, SVG_ROOT, x, y, aspect
     SVG_ROOT.appendChild(background_svg)
 
     let obj_tree = "children" in filetree_obj ? squarify(x,y,width,height,filetree_obj.children, cur_path, 0, SVG_ROOT) : handle_row([filetree_obj], x, y, width, height, cur_path, 0, SVG_ROOT)
-
     obj_tree.forEach((val) => draw_tree(val, SVG_ROOT))
 
     EXTENSION_MAP.clear()
