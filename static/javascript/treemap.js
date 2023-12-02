@@ -180,8 +180,8 @@ function get_box_text_element(obj) {
     element.appendChild(text)
     element.appendChild(title)
 
-    if (obj.area >= Math.max(0, MIN_AREA)) {
-        element.classList.add("is_visible")
+    if (obj.area < Math.max(0, MIN_AREA)) {
+        element.classList.add("is_not_visible")
     }
 
     return element
@@ -197,6 +197,7 @@ function fraction_to_saturation_and_lightness(fraction) {
 
 function delete_children(node) {
     node.querySelectorAll("svg").forEach((child) => node.removeChild(child))
+    node.querySelectorAll(".svg_background").forEach((child) => node.removeChild(child))
 }
 
 function get_child_from_path(obj, path) {
