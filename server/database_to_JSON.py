@@ -60,7 +60,7 @@ def get_filtered_query(filter):
         params.extend(date_expand)
 
     if len(wheres_inner) == 0:
-        wheres_inner = ["0"]
+        wheres_inner = ["1"]
     query = base_query.replace("JOIN_LINE", " ".join(joins)).replace("WHERE_LINE", " AND ".join(wheres)).replace("WHERE_INNER_LINE", " AND ".join(wheres_inner))
     return query, tuple(params)
 

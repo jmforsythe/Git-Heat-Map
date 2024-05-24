@@ -76,6 +76,14 @@ input[type=number] {
     color: #909090;
 }
 
+.list_item.filetree .list_item_text {
+    font-weight: bold;
+}
+
+.list_item.filetree .filetree_button {
+    color: red;
+}
+
 .control_box {
     display: flex;
     border: black 1px solid;

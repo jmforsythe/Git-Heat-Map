@@ -71,6 +71,13 @@ def treemap_page(name):
 @cache_on_db_change
 @valid_db_check
 def filetree_json(name):
+    if request.args.keys():
+        valid_keys = ("email_include", "email_exclude", "commit_include", "commit_exclude", "filename_include", "filename_exclude", "datetime_include", "datetime_exclude")
+        params = {key: tuple(request.args.getlist(key)) for key in valid_keys if key in request.args.keys()}
+        params_frozen = frozenset(params.items())
+        return get_json_with_params(name, params_frozen)
+
+    # If no parameters are given, use specially cached result
     this_repo_dir = repos_dir / pathlib.Path(name)
     db_path = (this_repo_dir / this_repo_dir.stem).with_suffix(".db")
     json_path = this_repo_dir / "filetree.json"
@@ -95,7 +102,7 @@ def highight_json(name):
     valid_keys = ("email_include", "email_exclude", "commit_include", "commit_exclude", "filename_include", "filename_exclude", "datetime_include", "datetime_exclude")
     params = {key: tuple(request.args.getlist(key)) for key in valid_keys if key in request.args.keys()}
     params_frozen = frozenset(params.items())
-    return get_highlight_json(name, params_frozen)
+    return get_json_with_params(name, params_frozen)
 
 @app.route("/<path:name>/.gitmodules")
 @cache_on_db_change
@@ -125,7 +132,7 @@ def sql_query(name, query):
         return out
 
 @functools.lru_cache(maxsize=100)
-def get_highlight_json(name, params):
+def get_json_with_params(name, params):
     this_repo_dir = repos_dir / pathlib.Path(name)
     db_path = (this_repo_dir / this_repo_dir.stem).with_suffix(".db")
     params_dict = {a[0]: a[1] for a in params}

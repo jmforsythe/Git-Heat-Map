@@ -13,6 +13,16 @@ function make_list_item(text) {
     close_button.onclick = () => {
         el.parentElement.removeChild(el)
     }
+    let filetree_button = document.createElement("button")
+    el.appendChild(filetree_button)
+    filetree_button.innerText = "!"
+    filetree_button.width = "1em"
+    filetree_button.classList.add("filetree_button")
+    filetree_button.onclick = (event) => {
+        event.stopPropagation()
+        el.classList.toggle("filetree")
+    }
+    filetree_button.title = "Toggle filetree filtering\nIf enabled controls boxes being displayed at all instead of just colouring"
     el.onclick = () => {
         el.classList.toggle("item_negated")
     }
@@ -47,13 +57,14 @@ function date_entry_setup(filter_id) {
     }
 }
 
-function get_include_exclude(filter_name, filter_id) {
+function get_include_exclude(filter_name, filter_id, filetree) {
     let filter = document.getElementById(filter_id)
     let filter_list = filter.querySelector(".item_list")
     let children = filter_list.querySelectorAll(".list_item")
     let include = []
     let exclude = []
     children.forEach((c) => {
+        if (!filetree && !c.classList.contains("filetree")) return
         if (c.classList.contains("item_negated")) {
             exclude.push(c.querySelector(".list_item_text").innerText)
         } else {
@@ -152,9 +163,13 @@ function get_hue() {
 
 function get_query_object() {
     const query_list = [["email", "email_filter"], ["commit", "commit_filter"], ["filename", "filename_filter"], ["datetime", "datetime_filter"]]
-    let query = {}
-    query_list.forEach((q) => query = {...query, ...get_include_exclude(...q)})
-    return query
+    let query_filetree = {}
+    let query_highlight = {}
+    query_list.forEach((q) => {
+        query_filetree = {...query_filetree, ...get_include_exclude(...q, true)}
+        query_highlight = {...query_highlight, ...get_include_exclude(...q, false)}
+    })
+    return {filetree: query_filetree, highlight: query_highlight}
 }
 
 function submit_query_setup() {
@@ -163,7 +178,7 @@ function submit_query_setup() {
         submit_button.onclick = () => {
             const query = get_query_object()
             save_query(query)
-            display_filetree_with_params({}, query, get_hue())
+            display_filetree_with_params(query.filetree, query.highlight, get_hue())
         }
     }
 }
@@ -214,33 +229,40 @@ function export_svg_setup() {
 }
 
 function save_query(query) {
-    localStorage.setItem(document.title + "_stored_query", JSON.stringify(query))
+    localStorage.setItem(document.title + "_stored_query_filetree", JSON.stringify(query.filetree))
+    localStorage.setItem(document.title + "_stored_query_highlight", JSON.stringify(query.highlight))
 }
 
 function load_query() {
     const query_list = [["email", "email_filter"], ["commit", "commit_filter"], ["filename", "filename_filter"], ["datetime", "datetime_filter"]]
-    const query = JSON.parse(localStorage.getItem(document.title + "_stored_query"))
-    if (!query) return
-    query_list.forEach((q) => {
-        const name = q[0]
-        const filter_id = q[1]
-        const filter = document.getElementById(filter_id)
-        const filter_list = filter.querySelector(".item_list")
-        if (name+"_include" in query) {
-            query[name+"_include"].forEach((val) => {
-                if (val && val != "") { 
-                    filter_list.appendChild(make_list_item(val))
-                }
-            })
-        }
-        if (name+"_exclude" in query) {
-            query[name+"_exclude"].forEach((val) => {
-                if (val && val != "") { 
-                    filter_list.appendChild(make_list_item(val)).classList.toggle("item_negated")
-                }
-            })
-        }
-    })
+    function get_part(part_name, filetree) {
+        const query = JSON.parse(localStorage.getItem(`${document.title}_stored_query_${part_name}`))
+        if (!query) return
+        query_list.forEach((q) => {
+            const name = q[0]
+            const filter_id = q[1]
+            const filter = document.getElementById(filter_id)
+            const filter_list = filter.querySelector(".item_list")
+            if (name+"_include" in query) {
+                query[name+"_include"].forEach((val) => {
+                    if (val && val != "") {
+                        filter_list.appendChild(make_list_item(val))
+                        if (filetree) filter_list.lastChild.classList.toggle("filetree")
+                    }
+                })
+            }
+            if (name+"_exclude" in query) {
+                query[name+"_exclude"].forEach((val) => {
+                    if (val && val != "") {
+                        filter_list.appendChild(make_list_item(val)).classList.toggle("item_negated")
+                        if (filetree) filter_list.lastChild.classList.toggle("filetree")
+                    }
+                })
+            }
+        })
+    }
+    get_part("filetree",true)
+    get_part("highlight")
 }
 
 function main() {
