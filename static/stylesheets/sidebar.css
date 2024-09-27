@@ -1,22 +1,24 @@
 #sidebar {
-    background-color: #707070;
-    margin: 0;
-    padding: 0;
+    background-color: #aaa;
+    border-radius: 5px;
+    margin: 10px 5px;
+    padding: 0px 5px;
     display: flex;
     flex-direction: column;
-    flex-basis: 10%;
+    flex-basis: 20%;
     align-items: center;
     
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
+    font-family: Helvetica, Arial, sans-serif;
 }
 
 .sidebar_container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 10%;
-    padding-bottom: 5%;
+    margin-top: 2vh;
+    padding-bottom: 1vh;
     width: 100%;
     border: 2px solid black;
     box-sizing: border-box;
@@ -24,7 +26,7 @@
 
 .sidebar_container:last-of-type {
     margin-top: auto;
-    margin-bottom: 10%;
+    margin-bottom: 2vh;
 }
 
 input {
@@ -90,8 +92,8 @@ input[type=number] {
     align-items: center;
     justify-content: center;
     align-self: stretch;
-    padding: 2%;
-    margin: 2%;
+    padding: 2% 0.5vh;
+    margin: 2% 0.5vh;
 }
 
 .control_box label {
@@ -118,8 +120,8 @@ input[type=number] {
     display: inline-flex;
     border: black 1px solid;
     align-items: center;
-    padding: 2%;
-    margin: 2%;
+    padding: 2% 0.5vh;
+    margin: 2% 0.5vh;
 }
 
 .color_picker_container .color_display {
@@ -160,8 +162,8 @@ input[type=number] {
     align-items: center;
     justify-content: center;
     align-self: stretch;
-    padding: 2%;
-    margin: 2%;
+    padding: 2% 0.5vh;
+    margin: 2% 0.5vh;
 }
 
 .checkbox_tree ul {
@@ -179,4 +181,50 @@ input[type=number] {
     display: inline-flex;
     flex-direction: row;
     justify-content: flex-start;
+}
+
+.tooltip {
+    position: relative;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 100%;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+   
+    position: absolute;
+    z-index: 500;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -50%; 
+}
+
+.tooltip_reverse .tooltiptext {
+    bottom: auto;
+    top: 100%;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+
+.tooltip .tooltiptext::after {
+    content: " ";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+}
+
+.tooltip_reverse .tooltiptext::after {
+    top: auto;
+    bottom: 100%;
+    border-color: transparent transparent black transparent;
 }

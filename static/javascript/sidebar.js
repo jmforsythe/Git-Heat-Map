@@ -26,6 +26,7 @@ function make_list_item(text) {
     el.onclick = () => {
         el.classList.toggle("item_negated")
     }
+    el.title = "Click to toggle inclusion/exclusion"
     return el
 }
 

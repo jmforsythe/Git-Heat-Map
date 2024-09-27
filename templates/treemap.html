@@ -15,7 +15,8 @@
             </svg>
         </div>
         <div id="sidebar">
-            <div class="sidebar_container" id="email_filter">
+            <div class="sidebar_container tooltip tooltip_reverse" id="email_filter">
+                <span class="tooltiptext">Specific emails or wildcards<br>%@github.com<br>123@example.com</span>
                 Email filter
                 <button type="button" class="link_button" onclick="browse_authors()">Browse</button>
                 <input type="text" name="email" class="text_entry"/>
@@ -29,7 +30,8 @@
                 <input type="button" value="Add hash" class="text_submit"/>
                 <div class="item_list"></div>
             </div>
-            <div class="sidebar_container" id="filename_filter">
+            <div class="sidebar_container tooltip" id="filename_filter">
+                <span class="tooltiptext">Specific file paths or wildcards<br>src/%<br>%.cpp</span>
                 File path filter
                 <button type="button" class="link_button" onclick="browse_files()">Browse</button>
                 <input type="text" name="filenames" class="text_entry"/>
@@ -43,23 +45,30 @@
                 <input type="button" value="Add date range" class="date_submit"/>
                 <div class="item_list"></div>
             </div>
-            <div class="sidebar_container">
+            <div style="width: 100%">
                 <div class="checkbox_tree hidden" id="submodule_tree">
                     Submodules
                 </div>
-                <div class="control_box">
+            </div>
+            <div class="sidebar_container">
+                Styling
+                <div class="control_box tooltip">
+                    <span class="tooltiptext">Disabled: highlight intensity proportional to total activity in that file matching the given filters.<br> Enabled (default): Divides intensity by total activity for that file.</span>
                     <label for="highlight_control">Fractional highlighting</label>
                     <input type="checkbox" name="highlight_control" id="highlight_control" checked="true"/>
                 </div>
-                <div class="control_box">
+                <div class="control_box tooltip">
+                    <span class="tooltiptext">How many layers deep to draw file/directory names, with larger numbers reducing performance.</span>
                     <label for="text_depth_number">Text levels</label>
                     <input type="number" name="text_depth_number" id="text_depth_number" value="1" min="0"/>
                 </div>
-                <div class="control_box">
+                <div class="control_box tooltip">
+                    <span class="tooltiptext">Don't render boxes below this size (number of changes), with larger numbers improving performance.</span>
                     <label for="size_picker_number">Min area</label>
                     <input type="number" name="size_picker_number" id="size_picker_number" value="0" min="0"/>
                 </div>
-                <div class="color_picker_container" id="sidebar_color_picker">
+                <div class="color_picker_container tooltip" id="sidebar_color_picker">
+                    <span class="tooltiptext">Colour specific hue:<br>Disabled (default): Colour individual files by their extension.<br>Enabled: Colour all files the hue specified on the right.</span>
                     <button type="button" class="link_button" onclick="show_colours()">Extensions</button>
                     <input type="checkbox" name="filetype_highlight_control" id="filetype_highlight_control" checked="true"/>
                     <label for="color_control">Hue</label>
@@ -70,10 +79,10 @@
                     <div class="color_display"></div>
                 </div>
                 <input type="button" value="Submit query" id="submit_query"/>
-                <input type="button" value="Refresh" id="refresh_button"/>
-                <input type="button" value="Back" id="back_button"/>
+                <input type="button" value="Refresh" id="refresh_button" title="Redraw with new style parameters without sending a new query"/>
+                <input type="button" value="Back" id="back_button" title="Go to previous folder view"/>
                 <div id="save_button">
-                    <input type="button" value="Export svg">
+                    <input type="button" value="Export svg" title="Save whole canvas as a .svg file">
                 </div>
                 <a href="/">Index</a>
             </div>

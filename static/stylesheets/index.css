@@ -5,7 +5,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #e7e7ee;
+    background-color: #fbfbfb;
+    font-family: Helvetica, Arial, sans-serif
 }
 
 main {
@@ -22,6 +23,7 @@ h1 {
 a {
     display: block;
     color: inherit;
+    text-decoration: none;
 }
 
 a:active {
@@ -37,8 +39,8 @@ a:active {
 .link_box {
     width: 200px;
     aspect-ratio: 1 / 1;
-    border: 1px solid black;
-    background-color: #d7d7dd;
+    background-color: #ebebeb;
+    border-radius: 10px;
     margin: 3%;
     cursor: pointer;
     display: flex;
@@ -48,7 +50,7 @@ a:active {
 
 .footer {
     width: 100%;
-    background-color: grey;
+    background-color: inherit;
     text-align: center;
     display: flex;
     flex-direction: row;
