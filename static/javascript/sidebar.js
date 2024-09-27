@@ -64,7 +64,7 @@ function get_include_exclude(filter_name, filter_id, filetree) {
     let include = []
     let exclude = []
     children.forEach((c) => {
-        if (!filetree && !c.classList.contains("filetree")) return
+        if (filetree != c.classList.contains("filetree")) return
         if (c.classList.contains("item_negated")) {
             exclude.push(c.querySelector(".list_item_text").innerText)
         } else {
