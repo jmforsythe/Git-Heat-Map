@@ -29,7 +29,15 @@ def generate_db(log_output, database_path):
     return last_commit
 
 def get_submodules(source_path):
-    l = subprocess.Popen(f"git -C {source_path}" + r" config -z --file .gitmodules --get-regexp submodule\..*\.path", stdout=subprocess.PIPE).stdout.read().split(b"\0")
+    args = [
+        "git",
+        "-C", source_path,
+        "config", "-z",
+        "--file", ".gitmodules",
+        "--get-regexp", r"submodule\..*\.path",
+    ]
+
+    l = subprocess.Popen(args, stdout=subprocess.PIPE).stdout.read().split(b"\0")
     return [pathlib.Path(os.fsdecode(i.splitlines()[1])) for i in l if len(i)]
 
 def generate_recursive(source_path, source_path_parent, dest_dir_parent):
